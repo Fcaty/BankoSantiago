@@ -9,6 +9,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
 import database.DBConn;
+import general.JournalizingForm.*;
 
 /**
  *
@@ -22,11 +23,13 @@ public class AddAccountTitle extends javax.swing.JFrame {
         char accountType = '\0';
         if(txtTitle.getText().isEmpty() || elementSelection.getSelectedIndex() == 0){
             JOptionPane.showMessageDialog(this, "Invalid entries, try again!");
+            return;
         }
         
         switch(elementSelection.getSelectedIndex()){
             case 1:
                 accountType = 'A';
+                break;
             case 2:
                 accountType = 'E';
         }       
@@ -38,13 +41,16 @@ public class AddAccountTitle extends javax.swing.JFrame {
                 PreparedStatement pstmt = con.prepareStatement(sql);
             
                 ){
-        
-            Object[] params = {
-                    txtTitle.getText(),
-                    'D',
-                    
-            };
             
+            pstmt.setString(1, txtTitle.getText());
+            pstmt.setString(2, "D");
+            pstmt.setString(3, Character.toString(accountType));
+            pstmt.executeUpdate();
+            
+            JOptionPane.showMessageDialog(this, "Account Title added!");
+            elementSelection.setSelectedIndex(0);
+            txtTitle.setText("");
+                    
         } catch (SQLException e){
             JOptionPane.showMessageDialog(this, "Connection failed! "+ e.getMessage());
         }
@@ -71,6 +77,7 @@ public class AddAccountTitle extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         elementSelection = new javax.swing.JComboBox<>();
         btnAdd = new javax.swing.JButton();
+        btnReturn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -94,6 +101,14 @@ public class AddAccountTitle extends javax.swing.JFrame {
             }
         });
 
+        btnReturn.setFont(new java.awt.Font("HYWenHei-85W", 0, 14)); // NOI18N
+        btnReturn.setText("Return");
+        btnReturn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReturnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -112,6 +127,8 @@ public class AddAccountTitle extends javax.swing.JFrame {
                 .addContainerGap(56, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnReturn)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnAdd)
                 .addGap(16, 16, 16))
         );
@@ -127,7 +144,9 @@ public class AddAccountTitle extends javax.swing.JFrame {
                     .addComponent(jLabel2)
                     .addComponent(elementSelection, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(btnAdd)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnAdd)
+                    .addComponent(btnReturn))
                 .addContainerGap(9, Short.MAX_VALUE))
         );
 
@@ -156,6 +175,12 @@ public class AddAccountTitle extends javax.swing.JFrame {
         addAccountTitle();
     }//GEN-LAST:event_btnAddActionPerformed
 
+    private void btnReturnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturnActionPerformed
+        JournalizingForm form = new JournalizingForm();
+        form.setVisible(true);
+        dispose();
+    }//GEN-LAST:event_btnReturnActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -183,6 +208,7 @@ public class AddAccountTitle extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
+    private javax.swing.JButton btnReturn;
     private javax.swing.JComboBox<String> elementSelection;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
