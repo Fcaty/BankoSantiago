@@ -106,6 +106,7 @@ public class JournalizingForm extends javax.swing.JFrame {
         }
     }
     
+    
     private boolean trackBalance(){
         double debitAmount = 0;
         double creditAmount = 0;
@@ -129,20 +130,34 @@ public class JournalizingForm extends javax.swing.JFrame {
         }
     }
     
+    private boolean verifyDate(int year, int month, int day){
+        
+    }
+    
     private void addEntry(){
         String sql;
+        String date;
         int journalID = 0;
         
-        
+        //Balance Verification, will be false if inbalanced
         if(!trackBalance()){
             JOptionPane.showMessageDialog(this, "Your debits and credits aren't balanced!");
             return;
         }
         
-        if(notesTxt.getText().isEmpty()){
-            JOptionPane.showMessageDialog(this, "Notes field is empty!");
+        //Field verificaiton, will be false if any field is empty
+        if(notesTxt.getText().isEmpty() || yearTxt.getText().isEmpty() || monthTxt.getText().isEmpty() || dayTxt.getText().isEmpty()){
+            JOptionPane.showMessageDialog(this, "A field is empty!");
             return;
         }
+        
+        //Date format verification
+        if(!verifyDate(Integer.parseInt(yearTxt.getText()), Integer.parseInt(monthTxt.getText()), Integer.parseInt(dayTxt.getText()))){
+            JOptionPane.showMessageDialog(this, "Invalid Date Input!");
+            return;
+        }
+        
+        date = yearTxt.getText() + "-" + monthTxt.getText() + "-" + dayTxt.getText();
         
         sql = "INSERT INTO accountingsystem.journal (Entry_Date, Notes) VALUES (?, ?)";
         
@@ -152,11 +167,27 @@ public class JournalizingForm extends javax.swing.JFrame {
            ){
             
             Object[] params = {
-                
-            }
+                date,
+                notesTxt.getText()
+            };
+            
+            pstmt.executeUpdate();
+            
+            JOptionPane.showMessageDialog(this, "Successfully recorded journal entry!");
+            notesTxt.setText("");
+            yearTxt.setText("");
+            monthTxt.setText("");
+            dayTxt.setText("");
+            
+            con.close();
+            
+        } catch (SQLException e){
+            JOptionPane.showMessageDialog(this, "Connection Failed! " + e.getMessage());
         }
                 
         try{
+            Connection con = DBConn.attemptConnection();
+            
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT Max(JID) FROM accountingsystem.journal");
             
@@ -206,9 +237,9 @@ public class JournalizingForm extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
+        dayTxt = new javax.swing.JTextField();
+        monthTxt = new javax.swing.JTextField();
+        yearTxt = new javax.swing.JTextField();
         jPanel5 = new javax.swing.JPanel();
         lblStatusConn = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
@@ -374,7 +405,6 @@ public class JournalizingForm extends javax.swing.JFrame {
         notesTxt.setColumns(20);
         notesTxt.setLineWrap(true);
         notesTxt.setRows(3);
-        notesTxt.setPreferredSize(new java.awt.Dimension(232, 52));
         jScrollPane2.setViewportView(notesTxt);
 
         btnSubmitEntry.setFont(new java.awt.Font("HYWenHei-85W", 0, 14)); // NOI18N
@@ -397,15 +427,15 @@ public class JournalizingForm extends javax.swing.JFrame {
         jLabel5.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
         jLabel5.setText("Year (yyyy)");
 
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+        dayTxt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+                dayTxtActionPerformed(evt);
             }
         });
 
-        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+        monthTxt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField2ActionPerformed(evt);
+                monthTxtActionPerformed(evt);
             }
         });
 
@@ -419,9 +449,7 @@ public class JournalizingForm extends javax.swing.JFrame {
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnSubmitEntry, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(btnSubmitEntry, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(16, 16, 16))
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -429,14 +457,14 @@ public class JournalizingForm extends javax.swing.JFrame {
                             .addGroup(jPanel4Layout.createSequentialGroup()
                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(monthTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(31, 31, 31)
                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jTextField1))
+                                    .addComponent(dayTxt))
                                 .addGap(54, 54, 54)
                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(yearTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel5))))
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
@@ -453,10 +481,11 @@ public class JournalizingForm extends javax.swing.JFrame {
                     .addComponent(jLabel4)
                     .addComponent(jLabel5))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(yearTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(dayTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(monthTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
                 .addComponent(btnSubmitEntry, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -594,13 +623,13 @@ public class JournalizingForm extends javax.swing.JFrame {
     
     }//GEN-LAST:event_btnSubmitEntryActionPerformed
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+    private void dayTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dayTxtActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    }//GEN-LAST:event_dayTxtActionPerformed
 
-    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+    private void monthTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_monthTxtActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField2ActionPerformed
+    }//GEN-LAST:event_monthTxtActionPerformed
 
     /**
      * @param args the command line arguments
@@ -635,6 +664,7 @@ public class JournalizingForm extends javax.swing.JFrame {
     private javax.swing.JButton btnEnterRecord;
     private javax.swing.JButton btnSubmitEntry;
     private javax.swing.JLabel credit;
+    private javax.swing.JTextField dayTxt;
     private javax.swing.JLabel debit;
     private javax.swing.JTable historyTable;
     private javax.swing.JLabel jLabel1;
@@ -650,14 +680,13 @@ public class JournalizingForm extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
     private javax.swing.JLabel lblCredit;
     private javax.swing.JLabel lblDebit;
     private javax.swing.JLabel lblStatusConn;
+    private javax.swing.JTextField monthTxt;
     private javax.swing.JTextArea notesTxt;
     private javax.swing.JComboBox<String> titleSelection;
     private javax.swing.JComboBox<String> typeSelection;
+    private javax.swing.JTextField yearTxt;
     // End of variables declaration//GEN-END:variables
 }
