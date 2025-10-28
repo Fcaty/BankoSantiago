@@ -80,12 +80,94 @@ public class LedgerForm extends javax.swing.JFrame {
         }
         
     }
+    
+    private void loadLedger(){
+        String selectedLedger;
+        DefaultTableModel dTb = (DefaultTableModel) debitsTable.getModel();
+        DefaultTableModel cTb = (DefaultTableModel) creditsTable.getModel();
+        dTb.setRowCount(0);
+        cTb.setRowCount(0);
+        
+        int AID = 0;
+        String normalSide = "";
+        try(
+                Connection con = DBConn.attemptConnection();
+                PreparedStatement accountNameIdentify = con.prepareStatement("SELECT AID, Normal_Side FROM accountingsystem.account_title where AName = ?");
+                PreparedStatement amountLoader = con.prepareStatement("SELECT Amount from accountingsystem.journal_entries where AID = ? AND Record_Type = ?");
+                PreparedStatement ledgerInfo = con.prepareStatement("SELECT Total_Credit, Total_Debit, Final_Value FROM ledger where AID = ?");
+                )
+        {
+            selectedLedger = (String) ledgerSelection.getSelectedItem();
+            accountNameIdentify.setString(1, selectedLedger);
+            ResultSet rs = accountNameIdentify.executeQuery();
+            
+            while(rs.next()){
+                AID = rs.getInt("AID");
+                normalSide = rs.getString("Normal_Side");
+            }
+            //Loads in debit entries from a given account title
+            amountLoader.setInt(1, AID);
+            amountLoader.setString(2, "D");
+            rs = amountLoader.executeQuery();
+            while(rs.next()){
+                Object[] row = { rs.getDouble("Amount") };
+                dTb.addRow(row);
+            }
+            
+            //Loads in credit entries from a given account title
+            amountLoader.setString(2, "C");
+            rs = amountLoader.executeQuery();
+            while(rs.next()){
+                Object[] row = { rs.getDouble("Amount")};
+                cTb.addRow(row);
+            }
+            
+            //Acquires total_credits, total_debits, & final_value from ledger table
+            ledgerInfo.setInt(1, AID);
+            rs = ledgerInfo.executeQuery();
+            while(rs.next()){
+                txtDebit.setText(Double.toString(rs.getDouble("Total_Debit")));
+                txtCredit.setText(Double.toString(rs.getDouble("Total_Credit")));
+                txtFinalVal.setText(Double.toString(rs.getDouble("Final_Value")));
+                if("D".equals(normalSide)){
+                    txtNormalSide.setText("DEBIT");
+                } else if ("C".equals(normalSide)){
+                    txtNormalSide.setText("CREDIT");
+                }
+            }
+            con.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Connection failed! "+ e.getMessage());
+        }
+        
+    }
+    
+    private void loadLedgerOptions(){
+        
+        try(
+                Connection con = DBConn.attemptConnection();
+                Statement stmtLedgers = con.createStatement();
+                ) 
+        {
+            ResultSet ledgerNames = stmtLedgers.executeQuery("SELECT AName FROM ledger INNER JOIN account_title ON ledger.AID = account_title.AID");
+            ledgerSelection.removeAllItems();
+            ledgerSelection.addItem("Select");
+            while(ledgerNames.next()){
+                ledgerSelection.addItem(ledgerNames.getString("AName"));
+            }
+        con.close();
+        } catch (SQLException e){
+            JOptionPane.showMessageDialog(this, "Connection failed! "+ e.getMessage());
+        }
+            
+            }
 
     /**
      * Creates new form LedgerForm
      */
     public LedgerForm() {
         initComponents();
+        loadLedgerOptions();
     }
 
     /**
@@ -102,23 +184,27 @@ public class LedgerForm extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         jTable3 = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        btnPost = new javax.swing.JButton();
+        ledgerSelection = new javax.swing.JComboBox<>();
+        btnSelect = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
+        txtDebit = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jSeparator1 = new javax.swing.JSeparator();
         jSeparator2 = new javax.swing.JSeparator();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        debitsTable = new javax.swing.JTable();
         jScrollPane4 = new javax.swing.JScrollPane();
-        jTable4 = new javax.swing.JTable();
+        creditsTable = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
+        txtFinalVal = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
+        txtNormalSide = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
+        txtCredit = new javax.swing.JLabel();
         btnReturn = new javax.swing.JButton();
         btnExport = new javax.swing.JButton();
+        btnPost = new javax.swing.JButton();
 
         jTable2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -150,13 +236,18 @@ public class LedgerForm extends javax.swing.JFrame {
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Selection", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        btnPost.setFont(new java.awt.Font("HYWenHei-85W", 0, 14)); // NOI18N
-        btnPost.setText("Post");
-        btnPost.addActionListener(new java.awt.event.ActionListener() {
+        ledgerSelection.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        ledgerSelection.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPostActionPerformed(evt);
+                ledgerSelectionActionPerformed(evt);
+            }
+        });
+
+        btnSelect.setFont(new java.awt.Font("HYWenHei-85W", 0, 14)); // NOI18N
+        btnSelect.setText("Select");
+        btnSelect.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSelectActionPerformed(evt);
             }
         });
 
@@ -166,9 +257,9 @@ public class LedgerForm extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(ledgerSelection, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnPost, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnSelect, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -176,30 +267,31 @@ public class LedgerForm extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnPost, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE))
+                    .addComponent(btnSelect, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(ledgerSelection, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE))
                 .addContainerGap(15, Short.MAX_VALUE))
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Total Debit", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
 
-        jLabel2.setText("jLabel2");
+        txtDebit.setFont(new java.awt.Font("HYWenHei-85W", 0, 24)); // NOI18N
+        txtDebit.setText("0.00");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(159, 159, 159)
-                .addComponent(jLabel2)
+                .addGap(25, 25, 25)
+                .addComponent(txtDebit, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(27, 27, 27)
-                .addComponent(jLabel2)
-                .addContainerGap(40, Short.MAX_VALUE))
+                .addGap(26, 26, 26)
+                .addComponent(txtDebit)
+                .addContainerGap(41, Short.MAX_VALUE))
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Ledger Display", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
@@ -214,7 +306,7 @@ public class LedgerForm extends javax.swing.JFrame {
         jSeparator2.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 5));
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        debitsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null},
                 {null},
@@ -244,9 +336,9 @@ public class LedgerForm extends javax.swing.JFrame {
                 return types [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(debitsTable);
 
-        jTable4.setModel(new javax.swing.table.DefaultTableModel(
+        creditsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null},
                 {null},
@@ -276,7 +368,7 @@ public class LedgerForm extends javax.swing.JFrame {
                 return types [columnIndex];
             }
         });
-        jScrollPane4.setViewportView(jTable4);
+        jScrollPane4.setViewportView(creditsTable);
 
         jLabel1.setFont(new java.awt.Font("HYWenHei-85W", 0, 24)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -298,7 +390,7 @@ public class LedgerForm extends javax.swing.JFrame {
                     .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(190, 190, 190))
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(72, 72, 72)
+                .addGap(77, 77, 77)
                 .addComponent(jLabel1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -319,41 +411,68 @@ public class LedgerForm extends javax.swing.JFrame {
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder(null, "Final Value", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24)))); // NOI18N
 
+        txtFinalVal.setFont(new java.awt.Font("HYWenHei-85W", 0, 24)); // NOI18N
+        txtFinalVal.setText("0.00");
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(txtFinalVal, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(22, 22, 22))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 118, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(txtFinalVal)
+                .addContainerGap(19, Short.MAX_VALUE))
         );
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Normal Side", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
+
+        txtNormalSide.setFont(new java.awt.Font("HYWenHei-85W", 0, 24)); // NOI18N
+        txtNormalSide.setText("UNKNOWN");
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(25, 25, 25)
+                .addComponent(txtNormalSide, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(27, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 95, Short.MAX_VALUE)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(29, 29, 29)
+                .addComponent(txtNormalSide)
+                .addContainerGap(36, Short.MAX_VALUE))
         );
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Total Credit", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
+
+        txtCredit.setFont(new java.awt.Font("HYWenHei-85W", 0, 24)); // NOI18N
+        txtCredit.setText("0.00");
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(25, 25, 25)
+                .addComponent(txtCredit, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 95, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                .addContainerGap(35, Short.MAX_VALUE)
+                .addComponent(txtCredit)
+                .addGap(30, 30, 30))
         );
 
         btnReturn.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
@@ -367,6 +486,14 @@ public class LedgerForm extends javax.swing.JFrame {
         btnExport.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
         btnExport.setText("Export All");
         btnExport.setMargin(new java.awt.Insets(3, 14, 3, 14));
+
+        btnPost.setFont(new java.awt.Font("HYWenHei-85W", 0, 36)); // NOI18N
+        btnPost.setText("Post");
+        btnPost.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPostActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -384,9 +511,11 @@ public class LedgerForm extends javax.swing.JFrame {
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
-                        .addComponent(btnReturn, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnPost, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnReturn, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnExport, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -407,9 +536,12 @@ public class LedgerForm extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnReturn, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnReturn, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(btnPost, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -423,7 +555,16 @@ public class LedgerForm extends javax.swing.JFrame {
 
     private void btnPostActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPostActionPerformed
         generateLedgers();
+        loadLedgerOptions();
     }//GEN-LAST:event_btnPostActionPerformed
+
+    private void ledgerSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ledgerSelectionActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ledgerSelectionActionPerformed
+
+    private void btnSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectActionPerformed
+        loadLedger();
+    }//GEN-LAST:event_btnSelectActionPerformed
 
     /**
      * @param args the command line arguments
@@ -454,9 +595,10 @@ public class LedgerForm extends javax.swing.JFrame {
     private javax.swing.JButton btnExport;
     private javax.swing.JButton btnPost;
     private javax.swing.JButton btnReturn;
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JButton btnSelect;
+    private javax.swing.JTable creditsTable;
+    private javax.swing.JTable debitsTable;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -469,9 +611,12 @@ public class LedgerForm extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JTable jTable1;
     private javax.swing.JTable jTable2;
     private javax.swing.JTable jTable3;
-    private javax.swing.JTable jTable4;
+    private javax.swing.JComboBox<String> ledgerSelection;
+    private javax.swing.JLabel txtCredit;
+    private javax.swing.JLabel txtDebit;
+    private javax.swing.JLabel txtFinalVal;
+    private javax.swing.JLabel txtNormalSide;
     // End of variables declaration//GEN-END:variables
 }
