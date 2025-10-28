@@ -10,13 +10,19 @@ package general;
  */
 public class Entry {
     private String aName;
+    private int AID;
     private char recType;
     private double amount;
 
-    public Entry(String aName, char recType, double amount) {
+    public Entry(int AID, String aName, char recType, double amount) {
+        this.AID = AID;
         this.aName = aName;
         this.recType = recType;
         this.amount = amount;
+    }
+    
+    public int getAID(){
+        return this.AID;
     }
     
     public String getAName(){

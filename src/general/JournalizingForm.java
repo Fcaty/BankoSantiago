@@ -57,6 +57,7 @@ public class JournalizingForm extends javax.swing.JFrame {
     //Will insert an unfinalized record, locally.
     private void insertRecord(){
         String accountTitle;
+        int AID;
         char recordType = '\0';
         double amount = 0;
         
@@ -65,6 +66,7 @@ public class JournalizingForm extends javax.swing.JFrame {
             return;
         }
         
+        AID = titleSelection.getSelectedIndex();
         accountTitle = (String) titleSelection.getSelectedItem();
         amount = Double.parseDouble(amountTxt.getText());
         if(typeSelection.getSelectedIndex() == 1){
@@ -74,7 +76,7 @@ public class JournalizingForm extends javax.swing.JFrame {
         } 
        
            
-        Entry entry = new Entry(accountTitle, recordType, amount);
+        Entry entry = new Entry(AID, accountTitle, recordType, amount);
         entryList.add(entry);
         
         titleSelection.setSelectedIndex(0);
@@ -131,8 +133,7 @@ public class JournalizingForm extends javax.swing.JFrame {
     }
     
     private boolean verifyDate(int year, int month, int day){
-        year = 2005;
-        
+    
         return true;
     }
     
@@ -174,13 +175,6 @@ public class JournalizingForm extends javax.swing.JFrame {
             };
             
             pstmt.executeUpdate();
-            
-            JOptionPane.showMessageDialog(this, "Successfully recorded journal entry!");
-            notesTxt.setText("");
-            yearTxt.setText("");
-            monthTxt.setText("");
-            dayTxt.setText("");
-            
             con.close();
             
         } catch (SQLException e){
@@ -197,6 +191,35 @@ public class JournalizingForm extends javax.swing.JFrame {
             con.close();
         } catch (SQLException e){
             JOptionPane.showMessageDialog(this, "Connection Failed! " + e.getMessage());
+        }
+        
+        sql = "INSERT INTO accountingsystem.journal_entries (JID, AID, Amount, Record_Type)";
+        
+        try(
+               Connection con = DBConn.attemptConnection();
+               PreparedStatement pstmt = con.prepareStatement(sql);
+           ){
+            
+            for(Entry e : entryList){
+                Object[] params = {
+                  journalID,
+                  e.getAID(),
+                  e.getAmount(),
+                  e.getRecType()
+                };
+            }
+            
+            pstmt.executeUpdate();
+            con.close();
+            
+            JOptionPane.showMessageDialog(this, "Successfully recorded journal entry!");
+            notesTxt.setText("");
+            yearTxt.setText("");
+            monthTxt.setText("");
+            dayTxt.setText("");
+            
+        } catch (SQLException e){
+            JOptionPane.showMessageDialog(this, "Connection Failed! "+ e.getMessage());
         }
     }
     
@@ -622,7 +645,7 @@ public class JournalizingForm extends javax.swing.JFrame {
     }//GEN-LAST:event_typeSelectionActionPerformed
 
     private void btnSubmitEntryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubmitEntryActionPerformed
-    
+        addEntry();
     }//GEN-LAST:event_btnSubmitEntryActionPerformed
 
     private void dayTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dayTxtActionPerformed

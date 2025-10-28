@@ -3,6 +3,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package general;
+import java.sql.*;
+import java.io.*;
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.table.*;
+import database.DBConn;
 
 /**
  *
@@ -11,7 +17,38 @@ package general;
 public class AddAccountTitle extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AddAccountTitle.class.getName());
-
+    
+    private void addAccountTitle(){
+        char accountType = '\0';
+        if(txtTitle.getText().isEmpty() || elementSelection.getSelectedIndex() == 0){
+            JOptionPane.showMessageDialog(this, "Invalid entries, try again!");
+        }
+        
+        switch(elementSelection.getSelectedIndex()){
+            case 1:
+                accountType = 'A';
+            case 2:
+                accountType = 'E';
+        }       
+        
+        String sql = ("INSERT INTO accountingsystem.account_title (AName, Normal_Side, Account_Type) values (?, ?, ?)");
+        
+        try(
+                Connection con = DBConn.attemptConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql);
+            
+                ){
+        
+            Object[] params = {
+                    txtTitle.getText(),
+                    'D',
+                    
+            };
+            
+        } catch (SQLException e){
+            JOptionPane.showMessageDialog(this, "Connection failed! "+ e.getMessage());
+        }
+    }
     /**
      * Creates new form AddAccountTitle
      */
@@ -30,10 +67,10 @@ public class AddAccountTitle extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        txtTitle = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jButton1 = new javax.swing.JButton();
+        elementSelection = new javax.swing.JComboBox<>();
+        btnAdd = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -42,18 +79,18 @@ public class AddAccountTitle extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("HYWenHei-85W", 0, 20)); // NOI18N
         jLabel1.setText("Title:");
 
-        jTextField1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtTitle.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
         jLabel2.setFont(new java.awt.Font("HYWenHei-85W", 0, 20)); // NOI18N
         jLabel2.setText("Type:");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Select", "Asset", "Expense" }));
+        elementSelection.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Select", "Asset", "Expense" }));
 
-        jButton1.setFont(new java.awt.Font("HYWenHei-85W", 0, 14)); // NOI18N
-        jButton1.setText("Add Title");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnAdd.setFont(new java.awt.Font("HYWenHei-85W", 0, 14)); // NOI18N
+        btnAdd.setText("Add Title");
+        btnAdd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnAddActionPerformed(evt);
             }
         });
 
@@ -67,15 +104,15 @@ public class AddAccountTitle extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(elementSelection, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 305, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 305, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(56, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1)
+                .addComponent(btnAdd)
                 .addGap(16, 16, 16))
         );
         jPanel1Layout.setVerticalGroup(
@@ -84,13 +121,13 @@ public class AddAccountTitle extends javax.swing.JFrame {
                 .addGap(22, 22, 22)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(elementSelection, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jButton1)
+                .addComponent(btnAdd)
                 .addContainerGap(9, Short.MAX_VALUE))
         );
 
@@ -115,9 +152,9 @@ public class AddAccountTitle extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
+        addAccountTitle();
+    }//GEN-LAST:event_btnAddActionPerformed
 
     /**
      * @param args the command line arguments
@@ -145,11 +182,11 @@ public class AddAccountTitle extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JButton btnAdd;
+    private javax.swing.JComboBox<String> elementSelection;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField txtTitle;
     // End of variables declaration//GEN-END:variables
 }
