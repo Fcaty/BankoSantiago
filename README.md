@@ -10,6 +10,7 @@ Journalizing:
   - Refresh History List per submission ✅
   - Refine date & time validation 
   - Print Journals through export
+  - (Optional) fix the horrible code here lmfao there's stuff that shouldn't repeat but i was too lazy :P
 
 Ledger:
   - Display Ledger per account title ✅
