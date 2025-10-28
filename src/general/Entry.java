@@ -1,0 +1,33 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package general;
+
+/**
+ *
+ * @author Fcaty
+ */
+public class Entry {
+    private String aName;
+    private char recType;
+    private double amount;
+
+    public Entry(String aName, char recType, double amount) {
+        this.aName = aName;
+        this.recType = recType;
+        this.amount = amount;
+    }
+    
+    public String getAName(){
+        return this.aName;
+    }
+    
+    public char getRecType(){
+        return this.recType;
+    }
+    
+    public double getAmount(){
+        return this.amount;
+    }
+}
