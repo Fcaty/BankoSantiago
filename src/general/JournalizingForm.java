@@ -193,7 +193,7 @@ public class JournalizingForm extends javax.swing.JFrame {
             ResultSet rs = stmt.executeQuery("SELECT Max(JID) FROM accountingsystem.journal");
             
             journalID = rs.getInt("JID");
-            
+            con.close();
         } catch (SQLException e){
             JOptionPane.showMessageDialog(this, "Connection Failed! " + e.getMessage());
         }
