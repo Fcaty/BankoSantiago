@@ -131,7 +131,8 @@ public class JournalizingForm extends javax.swing.JFrame {
     }
     
     private boolean verifyDate(int year, int month, int day){
-     
+     year = 2005;
+     month = 2005;
         return true;
     }
     
