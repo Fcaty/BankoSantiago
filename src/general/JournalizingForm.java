@@ -131,9 +131,29 @@ public class JournalizingForm extends javax.swing.JFrame {
     }
     
     private boolean verifyDate(int year, int month, int day){
-     year = 2005;
-     month = 2005;
+        
+        // Validation of year
+        if (year >= 9999 || year <= 0){
+            JOptionPane.showMessageDialog(null, "Invalid Year!");
+            return false;
+        }
+         
+        if (month < 1 || month > 12){
+            JOptionPane.showMessageDialog(null, "Invalid month!");
+            return false;
+        }
+        
+        int[] daysInMonth = { 31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+        
+        if (day < 1 || day > daysInMonth[month - 1]) {
+        JOptionPane.showMessageDialog(null, "Invalid Day!");
+        return false;
+    }
         return true;
+    }
+    
+    private boolean isLeapYear(int year) {
+    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
     }
     
     private void addEntry(){
