@@ -13,7 +13,7 @@ Journalizing:
 
 Ledger:
   - Display Ledger per account title
-  - Calculate title account final values
+  - Calculate title account final values ✅
   - Print all legders through export
 
 Unadjusted Trial Balance:
