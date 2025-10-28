@@ -12,9 +12,9 @@ Journalizing:
   - Print Journals through export
 
 Ledger:
-  - Display Ledger per account title
+  - Display Ledger per account title ✅
   - Calculate title account final values ✅
-  - Print all legders through export
+  - Print all legders through export 
 
 Unadjusted Trial Balance:
   - (Optional) Display unadjusted trial balance on app
