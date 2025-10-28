@@ -23,7 +23,7 @@ public class JournalizingForm extends javax.swing.JFrame {
     private final java.util.List<Entry> entryList = new java.util.ArrayList<>();
     
     //Loads options for titleSelection combo box
-    private void loadTitleOptions(){
+    public void loadTitleOptions(){
         Connection con = DBConn.attemptConnection();
         String status = null;
         
@@ -177,44 +177,32 @@ public class JournalizingForm extends javax.swing.JFrame {
         
         //Date format verification
         if(!verifyDate(Integer.parseInt(yearTxt.getText()), Integer.parseInt(monthTxt.getText()), Integer.parseInt(dayTxt.getText()))){
-            JOptionPane.showMessageDialog(this, "Invalid Date Input!");
             return;
         }
         
-        date = yearTxt.getText() + "-" + monthTxt.getText() + "-" + dayTxt.getText();
-        
+        date = yearTxt.getText() +"-"+ monthTxt.getText() +"-"+ dayTxt.getText();
         sql = "INSERT INTO accountingsystem.journal (Entry_Date, Notes) VALUES (?, ?)";
         
         try(
                 Connection con = DBConn.attemptConnection();
-                PreparedStatement pstmt = con.prepareStatement(sql); 
+                PreparedStatement pstmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS); 
            ){
             
-            Object[] params = {
-                date,
-                notesTxt.getText()
-            };
-            
+            pstmt.setString(1, date);
+            pstmt.setString(2, notesTxt.getText());
             pstmt.executeUpdate();
+            
+            ResultSet rs = pstmt.getGeneratedKeys();
+            if(rs.next()){
+                journalID = rs.getInt(1);
+            }
             con.close();
             
-        } catch (SQLException e){
-            JOptionPane.showMessageDialog(this, "Connection Failed! " + e.getMessage());
-        }
-                
-        try{
-            Connection con = DBConn.attemptConnection();
-            
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT Max(JID) FROM accountingsystem.journal");
-            
-            journalID = rs.getInt("JID");
-            con.close();
         } catch (SQLException e){
             JOptionPane.showMessageDialog(this, "Connection Failed! " + e.getMessage());
         }
         
-        sql = "INSERT INTO accountingsystem.journal_entries (JID, AID, Amount, Record_Type)";
+        sql = "INSERT INTO accountingsystem.journal_entries (JID, AID, Amount, Record_Type) values (?, ?, ?, ?)";
         
         try(
                Connection con = DBConn.attemptConnection();
@@ -222,15 +210,13 @@ public class JournalizingForm extends javax.swing.JFrame {
            ){
             
             for(Entry e : entryList){
-                Object[] params = {
-                  journalID,
-                  e.getAID(),
-                  e.getAmount(),
-                  e.getRecType()
-                };
+                pstmt.setInt(1, journalID);
+                pstmt.setInt(2, e.getAID());
+                pstmt.setDouble(3, e.getAmount());
+                pstmt.setString(4, Character.toString(e.getRecType()));
+                pstmt.executeUpdate();
             }
             
-            pstmt.executeUpdate();
             con.close();
             
             JOptionPane.showMessageDialog(this, "Successfully recorded journal entry!");
@@ -238,6 +224,12 @@ public class JournalizingForm extends javax.swing.JFrame {
             yearTxt.setText("");
             monthTxt.setText("");
             dayTxt.setText("");
+            entryList.clear();
+            updateHistory();
+            updateHistory();
+            trackBalance();
+            lblStatusConn.setText("ONLINE");
+            lblStatusConn.setForeground(Color.decode("#00CC00"));
             
         } catch (SQLException e){
             JOptionPane.showMessageDialog(this, "Connection Failed! "+ e.getMessage());
@@ -293,6 +285,8 @@ public class JournalizingForm extends javax.swing.JFrame {
         credit = new javax.swing.JLabel();
         lblDebit = new javax.swing.JLabel();
         lblCredit = new javax.swing.JLabel();
+        btnReturn = new javax.swing.JButton();
+        btnClear = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Banko Santiago Accounting System");
@@ -440,7 +434,9 @@ public class JournalizingForm extends javax.swing.JFrame {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 352, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Entry Submission", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
@@ -534,7 +530,7 @@ public class JournalizingForm extends javax.swing.JFrame {
                         .addComponent(monthTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
                 .addComponent(btnSubmitEntry, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Status", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
@@ -603,6 +599,22 @@ public class JournalizingForm extends javax.swing.JFrame {
                 .addContainerGap(10, Short.MAX_VALUE))
         );
 
+        btnReturn.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
+        btnReturn.setText("Go Back");
+        btnReturn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReturnActionPerformed(evt);
+            }
+        });
+
+        btnClear.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
+        btnClear.setText("Clear");
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -613,12 +625,16 @@ public class JournalizingForm extends javax.swing.JFrame {
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnReturn, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(19, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -629,14 +645,18 @@ public class JournalizingForm extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(19, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnReturn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnClear, javax.swing.GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE))))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
 
         pack();
@@ -645,8 +665,9 @@ public class JournalizingForm extends javax.swing.JFrame {
 
     private void btnAddAccountTitleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddAccountTitleActionPerformed
         // TODO add your handling code here:apac
-        AddAccountTitle addTitle = new AddAccountTitle();
+        AddAccountTitleForm addTitle = new AddAccountTitleForm();
         addTitle.setVisible(true);
+        dispose();
     }//GEN-LAST:event_btnAddAccountTitleActionPerformed
 
     private void titleSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_titleSelectionActionPerformed
@@ -676,6 +697,20 @@ public class JournalizingForm extends javax.swing.JFrame {
     private void monthTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_monthTxtActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_monthTxtActionPerformed
+
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+        entryList.clear();
+        updateHistory();
+        trackBalance();
+        lblStatusConn.setText("ONLINE");
+        lblStatusConn.setForeground(Color.decode("#00CC00"));
+    }//GEN-LAST:event_btnClearActionPerformed
+
+    private void btnReturnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturnActionPerformed
+        HomeForm home = new HomeForm();
+        home.setVisible(true);
+        dispose();
+    }//GEN-LAST:event_btnReturnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -707,7 +742,9 @@ public class JournalizingForm extends javax.swing.JFrame {
     private javax.swing.JLabel accountTitleLabel1;
     private javax.swing.JTextField amountTxt;
     private javax.swing.JButton btnAddAccountTitle;
+    private javax.swing.JButton btnClear;
     private javax.swing.JButton btnEnterRecord;
+    private javax.swing.JButton btnReturn;
     private javax.swing.JButton btnSubmitEntry;
     private javax.swing.JLabel credit;
     private javax.swing.JTextField dayTxt;

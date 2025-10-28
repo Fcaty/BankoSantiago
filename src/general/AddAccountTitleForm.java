@@ -15,9 +15,9 @@ import general.JournalizingForm.*;
  *
  * @author Fcaty
  */
-public class AddAccountTitle extends javax.swing.JFrame {
+public class AddAccountTitleForm extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AddAccountTitle.class.getName());
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AddAccountTitleForm.class.getName());
     
     private void addAccountTitle(){
         char accountType = '\0';
@@ -58,7 +58,7 @@ public class AddAccountTitle extends javax.swing.JFrame {
     /**
      * Creates new form AddAccountTitle
      */
-    public AddAccountTitle() {
+    public AddAccountTitleForm() {
         initComponents();
     }
 
@@ -203,7 +203,7 @@ public class AddAccountTitle extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new AddAccountTitle().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new AddAccountTitleForm().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
