@@ -82,11 +82,22 @@ public class LedgerForm extends javax.swing.JFrame {
     }
     
     private void loadLedger(){
+        
+        
         String selectedLedger;
         DefaultTableModel dTb = (DefaultTableModel) debitsTable.getModel();
         DefaultTableModel cTb = (DefaultTableModel) creditsTable.getModel();
         dTb.setRowCount(0);
         cTb.setRowCount(0);
+        
+        if(ledgerSelection.getSelectedIndex() == 0){
+            txtDebit.setText("0.0");
+            txtCredit.setText("0.0");
+            txtAccountTitle.setText("Account Title");
+            txtFinalVal.setText("0.0");
+            txtNormalSide.setText("UNKNOWN");
+            return;
+        }
         
         int AID = 0;
         String normalSide = "";
@@ -98,6 +109,7 @@ public class LedgerForm extends javax.swing.JFrame {
                 )
         {
             selectedLedger = (String) ledgerSelection.getSelectedItem();
+            txtAccountTitle.setText(selectedLedger);
             accountNameIdentify.setString(1, selectedLedger);
             ResultSet rs = accountNameIdentify.executeQuery();
             
@@ -133,6 +145,8 @@ public class LedgerForm extends javax.swing.JFrame {
                     txtNormalSide.setText("DEBIT");
                 } else if ("C".equals(normalSide)){
                     txtNormalSide.setText("CREDIT");
+                } else {
+                    txtNormalSide.setText("UNKNOWN");
                 }
             }
             con.close();
@@ -195,7 +209,7 @@ public class LedgerForm extends javax.swing.JFrame {
         debitsTable = new javax.swing.JTable();
         jScrollPane4 = new javax.swing.JScrollPane();
         creditsTable = new javax.swing.JTable();
-        jLabel1 = new javax.swing.JLabel();
+        txtAccountTitle = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         txtFinalVal = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
@@ -370,35 +384,36 @@ public class LedgerForm extends javax.swing.JFrame {
         });
         jScrollPane4.setViewportView(creditsTable);
 
-        jLabel1.setFont(new java.awt.Font("HYWenHei-85W", 0, 24)); // NOI18N
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Account Title");
+        txtAccountTitle.setFont(new java.awt.Font("HYWenHei-85W", 0, 24)); // NOI18N
+        txtAccountTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        txtAccountTitle.setText("Account Title");
+        txtAccountTitle.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(txtAccountTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 8, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 8, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(190, 190, 190))
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(77, 77, 77)
-                .addComponent(jLabel1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(13, 13, 13)
-                .addComponent(jLabel1)
+                .addComponent(txtAccountTitle)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 8, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -550,7 +565,9 @@ public class LedgerForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnReturnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturnActionPerformed
-        // TODO add your handling code here:
+        HomeForm home = new HomeForm();
+        home.setVisible(true);
+        dispose();
     }//GEN-LAST:event_btnReturnActionPerformed
 
     private void btnPostActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPostActionPerformed
@@ -598,7 +615,6 @@ public class LedgerForm extends javax.swing.JFrame {
     private javax.swing.JButton btnSelect;
     private javax.swing.JTable creditsTable;
     private javax.swing.JTable debitsTable;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -614,6 +630,7 @@ public class LedgerForm extends javax.swing.JFrame {
     private javax.swing.JTable jTable2;
     private javax.swing.JTable jTable3;
     private javax.swing.JComboBox<String> ledgerSelection;
+    private javax.swing.JLabel txtAccountTitle;
     private javax.swing.JLabel txtCredit;
     private javax.swing.JLabel txtDebit;
     private javax.swing.JLabel txtFinalVal;
