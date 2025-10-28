@@ -37,8 +37,8 @@ public class HomeForm extends javax.swing.JFrame {
         btnJournalize = new javax.swing.JButton();
         btnLedger = new javax.swing.JButton();
         btnTrialBalance = new javax.swing.JButton();
-        btnBalanceSheet = new javax.swing.JButton();
-        btnIncomeStatement = new javax.swing.JButton();
+        btnReports = new javax.swing.JButton();
+        btnTruncateTable = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
 
@@ -91,19 +91,19 @@ public class HomeForm extends javax.swing.JFrame {
             }
         });
 
-        btnBalanceSheet.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
-        btnBalanceSheet.setText("View Balance Sheet");
-        btnBalanceSheet.addActionListener(new java.awt.event.ActionListener() {
+        btnReports.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
+        btnReports.setText("Generate FS");
+        btnReports.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBalanceSheetActionPerformed(evt);
+                btnReportsActionPerformed(evt);
             }
         });
 
-        btnIncomeStatement.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
-        btnIncomeStatement.setText("View Income Statement");
-        btnIncomeStatement.addActionListener(new java.awt.event.ActionListener() {
+        btnTruncateTable.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
+        btnTruncateTable.setText("Clear Entries");
+        btnTruncateTable.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnIncomeStatementActionPerformed(evt);
+                btnTruncateTableActionPerformed(evt);
             }
         });
 
@@ -142,8 +142,8 @@ public class HomeForm extends javax.swing.JFrame {
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(btnIncomeStatement, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(btnBalanceSheet, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(btnTruncateTable, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(btnReports, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(btnTrialBalance, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(btnLedger, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(btnJournalize, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -180,9 +180,9 @@ public class HomeForm extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnTrialBalance, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnBalanceSheet, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnReports, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnIncomeStatement, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(btnTruncateTable, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(20, Short.MAX_VALUE))
         );
@@ -208,9 +208,9 @@ public class HomeForm extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnBalanceSheetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBalanceSheetActionPerformed
+    private void btnReportsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReportsActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_btnBalanceSheetActionPerformed
+    }//GEN-LAST:event_btnReportsActionPerformed
 
     private void btnJournalizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnJournalizeActionPerformed
         JournalizingForm journal = new JournalizingForm();
@@ -222,9 +222,9 @@ public class HomeForm extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_btnTrialBalanceActionPerformed
 
-    private void btnIncomeStatementActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIncomeStatementActionPerformed
+    private void btnTruncateTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTruncateTableActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_btnIncomeStatementActionPerformed
+    }//GEN-LAST:event_btnTruncateTableActionPerformed
 
     private void btnLedgerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLedgerActionPerformed
         LedgerForm ledger = new LedgerForm();
@@ -258,11 +258,11 @@ public class HomeForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnBalanceSheet;
-    private javax.swing.JButton btnIncomeStatement;
     private javax.swing.JButton btnJournalize;
     private javax.swing.JButton btnLedger;
+    private javax.swing.JButton btnReports;
     private javax.swing.JButton btnTrialBalance;
+    private javax.swing.JButton btnTruncateTable;
     private javax.swing.JLabel infoCourse;
     private javax.swing.JLabel infoCourse1;
     private javax.swing.JLabel jLabel1;

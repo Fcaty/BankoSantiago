@@ -50,7 +50,7 @@ public class JournalizingForm extends javax.swing.JFrame {
             con.close();
             
         } catch (SQLException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Connection Failed! " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Connection Failed! " + e.getMessage());
         }
     }
     
