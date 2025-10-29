@@ -2,7 +2,7 @@ TODO List:
 
 Main Menu:
   - Basic navigation ✅
-  - Table truncation
+  - Table truncation ✅
 
 Journalizing: 
   - Error Handling (Avoid negative number inputs)  
@@ -22,5 +22,5 @@ Unadjusted Trial Balance:
   - (Optional) Print Unadjusted Trial Balance through export
 
 Financial Statements
-  - Print Balance Sheet through export
-  - Print Income Sheet through export
+  - Print Balance Sheet through export ✅
+  - Print Income Sheet through export ✅
