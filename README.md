@@ -5,7 +5,7 @@ Main Menu:
   - Table truncation ✅
 
 Journalizing: 
-  - Error Handling (Avoid negative number inputs)  
+  - Error Handling (Avoid negative number inputs) ✅
   - Protection against account title deletion ✅
   - Refresh History List per submission ✅
   - Refine date & time validation ✅
@@ -19,7 +19,7 @@ Ledger:
 
 Unadjusted Trial Balance:
   - Display unadjusted trial balance on app ✅
-  - (Optional) Print Unadjusted Trial Balance through export
+  - (Optional) Print Unadjusted Trial Balance through export 
 
 Financial Statements
   - Print Balance Sheet through export ✅
