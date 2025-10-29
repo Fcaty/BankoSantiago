@@ -9,7 +9,7 @@ Journalizing:
   - Protection against account title deletion ✅
   - Refresh History List per submission ✅
   - Refine date & time validation ✅
-  - (Optional) Print Journals through export
+  - (Optional) Print Journals through export ✅
   - (Optional) fix the horrible code here lmfao there's stuff that shouldn't repeat but i was too lazy :P
 
 Ledger:
@@ -19,7 +19,7 @@ Ledger:
 
 Unadjusted Trial Balance:
   - Display unadjusted trial balance on app ✅
-  - (Optional) Print Unadjusted Trial Balance through export 
+  - (Optional) Print Unadjusted Trial Balance through export ✅
 
 Financial Statements
   - Print Balance Sheet through export ✅
