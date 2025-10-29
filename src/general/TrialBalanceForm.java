@@ -19,12 +19,53 @@ public class TrialBalanceForm extends javax.swing.JFrame {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(TrialBalanceForm.class.getName());
 
     private void generateUTB(){
+        String[] acctElements = {"A", "L", "C", "I", "E"};
+        DefaultTableModel tribalTB = (DefaultTableModel) unadjustedTable.getModel();
+        tribalTB.setRowCount(0);
+        double finalDebit = 0;
+        double finalCredit = 0;
         try(
                 Connection con = DBConn.attemptConnection();
+                PreparedStatement pstmtGetVal = con.prepareStatement("SELECT AName, Normal_Side, Final_Value FROM accountingsystem.ledger JOIN account_title ON ledger.AID = account_title.AID WHERE Account_Type = ?");
+                ){
+            
+            for(String s : acctElements){
+                pstmtGetVal.setString(1, s);
+                ResultSet rs = pstmtGetVal.executeQuery();
                 
-                )
+                while(rs.next()){
+                    //Generates a row for unadjusted trial balance table. If debit, leave credit field empty.
+                    if("D".equals(rs.getString("Normal_Side"))){
+                        Object[] row = {
+                            rs.getString("AName"),
+                            rs.getDouble("Final_Value"),
+                            " "
+                        };
+                        tribalTB.addRow(row);
+                        finalDebit += rs.getDouble("Final_Value"); //summation of debits
+                    //Generates a row for unadjusted trial balance table. If credit, leave debit field empty.
+                    } else if ("C".equals(rs.getString("Normal_Side"))){
+                        Object[] row = {
+                            rs.getString("AName"),
+                            " ",
+                            rs.getDouble("Final_Value")
+                        };
+                        tribalTB.addRow(row);
+                        finalCredit += rs.getDouble("Final_Value"); //summation of credits
+                    }
+                }
+            }
+            
+            lblFinalDebit.setText(Double.toString(finalDebit));
+            lblFinalCredit.setText(Double.toString(finalCredit));
+            lblYear.setText("For the Year "+txtYear.getText());
+            con.close();
+            
+        } catch (SQLException e){
+            JOptionPane.showMessageDialog(this, "Connection error!"+ e.getMessage());
+        }
         
-    }
+    } 
     
     /**
      * Creates new form TrialBalanceForm
@@ -46,11 +87,11 @@ public class TrialBalanceForm extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         unadjustedTable = new javax.swing.JTable();
-        jLabel3 = new javax.swing.JLabel();
+        lblYear = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
+        lblFinalDebit = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
+        lblFinalCredit = new javax.swing.JLabel();
         exportUTB = new javax.swing.JButton();
         btnReturn = new javax.swing.JButton();
         btnLoadTB = new javax.swing.JButton();
@@ -78,9 +119,9 @@ public class TrialBalanceForm extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(unadjustedTable);
 
-        jLabel3.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setText("For the Year ????");
+        lblYear.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
+        lblYear.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblYear.setText("For the Year ????");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -93,7 +134,7 @@ public class TrialBalanceForm extends javax.swing.JFrame {
                         .addContainerGap()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(lblYear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -102,7 +143,7 @@ public class TrialBalanceForm extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel3)
+                .addComponent(lblYear)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 502, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -110,8 +151,8 @@ public class TrialBalanceForm extends javax.swing.JFrame {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Total Debit", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
 
-        jLabel5.setFont(new java.awt.Font("HYWenHei-85W", 0, 24)); // NOI18N
-        jLabel5.setText("0.0");
+        lblFinalDebit.setFont(new java.awt.Font("HYWenHei-85W", 0, 24)); // NOI18N
+        lblFinalDebit.setText("0.0");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -119,21 +160,21 @@ public class TrialBalanceForm extends javax.swing.JFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblFinalDebit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(21, 21, 21)
-                .addComponent(jLabel5)
+                .addComponent(lblFinalDebit)
                 .addContainerGap(30, Short.MAX_VALUE))
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Total Credits", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
 
-        jLabel4.setFont(new java.awt.Font("HYWenHei-85W", 0, 24)); // NOI18N
-        jLabel4.setText("0.0");
+        lblFinalCredit.setFont(new java.awt.Font("HYWenHei-85W", 0, 24)); // NOI18N
+        lblFinalCredit.setText("0.0");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -141,14 +182,14 @@ public class TrialBalanceForm extends javax.swing.JFrame {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblFinalCredit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(31, 31, 31)
-                .addComponent(jLabel4)
+                .addComponent(lblFinalCredit)
                 .addContainerGap(34, Short.MAX_VALUE))
         );
 
@@ -170,6 +211,11 @@ public class TrialBalanceForm extends javax.swing.JFrame {
 
         btnLoadTB.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
         btnLoadTB.setText("Load Trial Balance");
+        btnLoadTB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoadTBActionPerformed(evt);
+            }
+        });
 
         jLabel2.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
         jLabel2.setText("Year");
@@ -246,6 +292,10 @@ public class TrialBalanceForm extends javax.swing.JFrame {
         dispose();
     }//GEN-LAST:event_btnReturnActionPerformed
 
+    private void btnLoadTBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadTBActionPerformed
+        generateUTB();
+    }//GEN-LAST:event_btnLoadTBActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -277,13 +327,13 @@ public class TrialBalanceForm extends javax.swing.JFrame {
     private javax.swing.JButton exportUTB;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblFinalCredit;
+    private javax.swing.JLabel lblFinalDebit;
+    private javax.swing.JLabel lblYear;
     private javax.swing.JTextField txtYear;
     private javax.swing.JTable unadjustedTable;
     // End of variables declaration//GEN-END:variables
