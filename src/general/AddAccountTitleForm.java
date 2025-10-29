@@ -60,6 +60,10 @@ public class AddAccountTitleForm extends javax.swing.JFrame {
      */
     public AddAccountTitleForm() {
         initComponents();
+                
+        elementSelection.addItem("Liability");
+        elementSelection.addItem("Equity");
+        elementSelection.addItem("Income");
     }
 
     /**
