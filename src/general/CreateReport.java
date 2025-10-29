@@ -27,17 +27,17 @@ public class CreateReport extends javax.swing.JFrame {
         double netIncome = 0;
         File count = new File("Output"+File.separator+"BlSheet"+File.separator+"count.txt");
         
-        try(
-                Scanner myScan = new Scanner((count));
-                ) {
-            int newCount = myScan.nextInt() + 1;
-            
-            filepath = "Output"+File.separator+"BlSheet"+File.separator+ "BalanceSheetNo"+(newCount) +".txt";
+        //To track amount of files
+        try(Scanner myScan = new Scanner((count))) {
+            int newCount = myScan.nextInt() + 1; //Name for new file
+            filepath = "Output"+File.separator+"BlSheet"+File.separator+ "BalanceSheetNo"+(newCount) +".txt"; //Filepath string
             
         } catch (FileNotFoundException e) {
             System.out.println("File not found!");
         } 
         
+        //File generation proper
+        //Length of string: 100
         try(
             PrintWriter pw = new PrintWriter(filepath);
             Connection con = DBConn.attemptConnection();
@@ -45,7 +45,6 @@ public class CreateReport extends javax.swing.JFrame {
                     + "FROM accountingsystem.account_title INNER JOIN accountingsystem.ledger "
                     + "ON account_title.AID = ledger.AID "
                     + "WHERE Account_Type = ? AND Current_Type = ?"); 
-            Statement stmt = con.createStatement();
                 ){
             
             //Heading
@@ -71,7 +70,6 @@ public class CreateReport extends javax.swing.JFrame {
                     totalAssets += rs.getDouble("Final_Value");
                 }
             }
-            
             pw.printf("%-50s %25s %25s\n\n", "    TOTAL ASSETS", Double.toString(totalAssets), "");
             
             //Liabilities and Owner's Equity
@@ -142,11 +140,66 @@ public class CreateReport extends javax.swing.JFrame {
         }
     
     }
-    
-    
-    
+
     private void generateIncomeStatement(){
+        File count = new File("Output"+File.separator+"InStat"+File.separator+"count.txt");
+        String filepath = "";
+        double totalIncome = 0;
+        double totalExpenses = 0;
+        double netProfit = 0;
         
+        try(Scanner myScan = new Scanner(count)){
+            int newCount = myScan.nextInt() + 1; //Name for new file
+            filepath = "Output"+File.separator+"InStat"+File.separator+ "IncomeStatementNo"+(newCount) +".txt"; //Filepath string
+        } catch (FileNotFoundException e) {
+            JOptionPane.showMessageDialog(this, "File not found!");
+        } 
+        
+        try(
+                PrintWriter pw = new PrintWriter(filepath);
+                Connection con = DBConn.attemptConnection();
+                PreparedStatement pstmtScraper = con.prepareStatement("SELECT AName, Final_Value "
+                    + "FROM accountingsystem.account_title INNER JOIN accountingsystem.ledger "
+                    + "ON account_title.AID = ledger.AID "
+                    + "WHERE Account_Type = ?");
+           ){
+            
+            //Heading
+            pw.printf("%-45s %10s %45s\n", " ", txtCompanyName.getText(), " ");
+            pw.printf("%-35s %30s %35s\n", " ", "Statement of Profit or Loss", " ");
+            pw.printf("%-40s %20s %40s\n", " ", "For the Year Ended "+txtYr.getText(), " ");
+            
+            //Income
+            pstmtScraper.setString(1, "I");
+            ResultSet rs = pstmtScraper.executeQuery();
+            while(rs.next()){
+                pw.printf("%-50s %25s %25s\n", rs.getString("AName"), " ",Double.toString(rs.getDouble("Final_Value")));
+                totalIncome += rs.getDouble("Final_Value");
+            }
+            
+            //TODO: maybe i could add a "cost of goods sold"? if may time lmao - ri
+            
+            pw.printf("%-50s %25s %25s\n", "Gross Profit", " ", totalIncome);
+            
+            //Expenses
+            pw.printf("%-50s %25s %25s\n", "Less: Operating Expenses", " ", " ");
+            pstmtScraper.setString(1, "E");
+            rs = pstmtScraper.executeQuery();
+            while(rs.next()){
+                pw.printf("%-50s %25s %25s\n", "    "+rs.getString("AName"), Double.toString(rs.getDouble("Final_Value"))," ");
+                totalExpenses += rs.getDouble("Final_Value");
+            }
+            
+            //Calculate net profit
+            netProfit = totalIncome - totalExpenses;
+            
+            pw.printf("%-50s %25s %25s\n", "NET INCOME / NET LOSS", " ", netProfit);
+            
+        } catch (FileNotFoundException e) {
+            JOptionPane.showMessageDialog(this, "File not found!");
+        } catch (SQLException e){
+            JOptionPane.showMessageDialog(this, "Connection failed! "+ e.getMessage());
+        }
     }
 
 
