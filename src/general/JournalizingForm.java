@@ -8,6 +8,8 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
 import database.DBConn;
+import java.io.*;
+import java.util.Scanner;
 
 /**
  *
@@ -125,6 +127,62 @@ public class JournalizingForm extends javax.swing.JFrame {
         }
     }
     
+    private void generateJournalSheet(){
+        File count = new File("Output"+File.separator+"Journals"+File.separator+"count.txt");
+        String filepath = "";
+        
+        try(Scanner myScan = new Scanner(count)){
+            int newCount = myScan.nextInt() + 1; //Name for new file
+            myScan.close();
+            FileWriter fw = new FileWriter(count);
+            fw.write(Integer.toString(newCount));
+            fw.close();
+            filepath = "Output"+File.separator+"Journals"+File.separator+ "JournalNo"+(newCount) +".txt"; //Filepath string
+        } catch (FileNotFoundException e) {
+            JOptionPane.showMessageDialog(this, "File not found!");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "IO Error! What did you do? This shouldn't be here!");
+        }
+        
+        try(
+                PrintWriter pw = new PrintWriter(filepath);
+                Connection con = DBConn.attemptConnection();
+                Statement stmt = con.createStatement();
+                PreparedStatement pstmtScraper = con.prepareStatement("SELECT AName, Amount, Record_Type "
+                        + "FROM accountingsystem.account_title INNER JOIN accountingsystem.journal_entries "
+                        + "ON account_title.AID = journal_entries.AID "
+                        + "WHERE JID = ?");
+           ){
+            
+            pw.printf("%-35s %30s %35s\n\n\n", " ", "Journalized Entries", " ");
+            
+            //Outer query, will query all journal entries and notes
+            ResultSet rsJournals = stmt.executeQuery("SELECT JID, Notes FROM accountingsystem.journal");
+            
+                while(rsJournals.next()){
+                    pstmtScraper.setInt(1, rsJournals.getInt("JID"));
+                    pw.println("Journal Entry #"+rsJournals.getInt("JID"));
+                    pw.println("------------------------------------------------------------------------------------------------------");
+                    //Inner loop, will query a journal entry's specific records
+                    ResultSet rs = pstmtScraper.executeQuery();
+                    while(rs.next()){
+                        if("D".equals(rs.getString("Record_Type"))){
+                            pw.printf("%-50s %25s %25s\n", rs.getString("AName"), Double.toString(rs.getDouble("Amount")), "");
+                        } else if ("C".equals(rs.getString("Record_Type"))){
+                            pw.printf("%-50s %25s %25s\n", rs.getString("AName"), "",Double.toString(rs.getDouble("Amount")));
+                        }
+                    }
+                    
+                    pw.printf("%-25s %-75s\n", " ", rsJournals.getString("Notes"));
+                    pw.println("------------------------------------------------------------------------------------------------------");
+                }
+                
+        } catch (FileNotFoundException e){
+            JOptionPane.showMessageDialog(this, "File not found!");
+        } catch (SQLException e){
+            JOptionPane.showMessageDialog(this, "Connection failed "+ e.getMessage());
+        }
+    }
     
     private boolean trackBalance(){
         double debitAmount = 0;
@@ -186,7 +244,7 @@ public class JournalizingForm extends javax.swing.JFrame {
             return;
         }
         
-        //Field verificaiton, will be false if any field is empty
+        //Field verification, will be false if any field is empty
         if(notesTxt.getText().isEmpty() || yearTxt.getText().isEmpty() || monthTxt.getText().isEmpty() || dayTxt.getText().isEmpty()){
             JOptionPane.showMessageDialog(this, "A field is empty!");
             return;
@@ -304,7 +362,7 @@ public class JournalizingForm extends javax.swing.JFrame {
         lblCredit = new javax.swing.JLabel();
         btnReturn = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        btnExport = new javax.swing.JButton();
         jDesktopPane1 = new javax.swing.JDesktopPane();
         jDesktopPane2 = new javax.swing.JDesktopPane();
 
@@ -539,7 +597,6 @@ public class JournalizingForm extends javax.swing.JFrame {
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -642,8 +699,13 @@ public class JournalizingForm extends javax.swing.JFrame {
             }
         });
 
-        jButton1.setFont(new java.awt.Font("HYWenHei-85W", 0, 24)); // NOI18N
-        jButton1.setText("Export ");
+        btnExport.setFont(new java.awt.Font("HYWenHei-85W", 0, 24)); // NOI18N
+        btnExport.setText("Export ");
+        btnExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jDesktopPane1Layout = new javax.swing.GroupLayout(jDesktopPane1);
         jDesktopPane1.setLayout(jDesktopPane1Layout);
@@ -684,7 +746,7 @@ public class JournalizingForm extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnExport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btnReturn, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -715,7 +777,7 @@ public class JournalizingForm extends javax.swing.JFrame {
                                 .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnReturn, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(btnExport, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jDesktopPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -725,7 +787,6 @@ public class JournalizingForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAddAccountTitleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddAccountTitleActionPerformed
-        // TODO add your handling code here:apac
         AddAccountTitleForm addTitle = new AddAccountTitleForm();
         addTitle.setVisible(true);
         dispose();
@@ -773,6 +834,10 @@ public class JournalizingForm extends javax.swing.JFrame {
         dispose();
     }//GEN-LAST:event_btnReturnActionPerformed
 
+    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
+        generateJournalSheet();
+    }//GEN-LAST:event_btnExportActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -805,13 +870,13 @@ public class JournalizingForm extends javax.swing.JFrame {
     private javax.swing.JButton btnAddAccountTitle;
     private javax.swing.JButton btnClear;
     private javax.swing.JButton btnEnterRecord;
+    private javax.swing.JButton btnExport;
     private javax.swing.JButton btnReturn;
     private javax.swing.JButton btnSubmitEntry;
     private javax.swing.JLabel credit;
     private javax.swing.JTextField dayTxt;
     private javax.swing.JLabel debit;
     private javax.swing.JTable historyTable;
-    private javax.swing.JButton jButton1;
     private javax.swing.JDesktopPane jDesktopPane1;
     private javax.swing.JDesktopPane jDesktopPane2;
     private javax.swing.JLabel jLabel1;
