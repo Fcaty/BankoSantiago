@@ -10,6 +10,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
 import database.DBConn;
+import java.util.Scanner;
 
 
 /**
@@ -19,6 +20,45 @@ import database.DBConn;
 public class LedgerForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(LedgerForm.class.getName());
+    
+    private void generateLedgerSheet(){
+        //ArrayList<Double> = new ArrayList;
+        double totalDebit = 0;
+        double totalCredit = 0;
+        File count = new File("Output"+File.separator+"Ledgers"+File.separator+"count.txt");
+        String filepath = "";
+        
+        try(Scanner myScan = new Scanner(count)){
+            int newCount = myScan.nextInt() + 1; //Name for new file
+            myScan.close();
+            FileWriter fw = new FileWriter(count);
+            fw.write(Integer.toString(newCount));
+            fw.close();
+            filepath = "Output"+File.separator+"Ledgers"+File.separator+ "JournalNo"+(newCount) +".txt"; //Filepath string
+        } catch (FileNotFoundException e) {
+            JOptionPane.showMessageDialog(this, "File not found!");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "IO Error! What did you do? This shouldn't be here!");
+        }
+        
+        try(
+                PrintWriter pw = new PrintWriter(filepath);
+                Connection con = DBConn.attemptConnection();
+                PreparedStatement pstmtScraper = con.prepareStatement("SELECT Amount, Record_Type "
+                        + "FROM accountingsystem.journal_entries "
+                        + "WHERE AID = ?")
+           ){
+            
+            pw.printf("%-15s %21s %15s\n"," ", "LedgerName", " ");
+            pw.println("==================================================");
+            pw.printf("%-25s %1s %25s\n", " ", "|", " ");
+            
+        } catch (FileNotFoundException e) {
+            JOptionPane.showMessageDialog(this, "File not found!");
+        } catch (SQLException e){
+            JOptionPane.showMessageDialog(this, "Connection error! "+ e.getMessage());
+        }
+    }
     
     private void generateLedgers(){
         int AID = 0;
@@ -506,6 +546,11 @@ public class LedgerForm extends javax.swing.JFrame {
         btnExport.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
         btnExport.setText("Export All");
         btnExport.setMargin(new java.awt.Insets(3, 14, 3, 14));
+        btnExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportActionPerformed(evt);
+            }
+        });
 
         btnPost.setFont(new java.awt.Font("HYWenHei-85W", 0, 36)); // NOI18N
         btnPost.setText("Post");
@@ -613,6 +658,10 @@ public class LedgerForm extends javax.swing.JFrame {
     private void btnLoadLedgerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadLedgerActionPerformed
         loadLedger();
     }//GEN-LAST:event_btnLoadLedgerActionPerformed
+
+    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
+        generateLedgerSheet();
+    }//GEN-LAST:event_btnExportActionPerformed
 
     /**
      * @param args the command line arguments
