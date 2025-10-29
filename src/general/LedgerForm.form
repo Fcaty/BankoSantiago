@@ -145,7 +145,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="ledgerSelection" min="-2" pref="219" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="btnSelect" max="32767" attributes="0"/>
+                  <Component id="btnLoadLedger" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -155,7 +155,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                      <Component id="btnSelect" max="32767" attributes="0"/>
+                      <Component id="btnLoadLedger" max="32767" attributes="0"/>
                       <Component id="ledgerSelection" pref="37" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace pref="15" max="32767" attributes="0"/>
@@ -182,7 +182,7 @@
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
         </Component>
-        <Component class="javax.swing.JButton" name="btnSelect">
+        <Component class="javax.swing.JButton" name="btnLoadLedger">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="HYWenHei-85W" size="14" style="0"/>
@@ -190,7 +190,7 @@
             <Property name="text" type="java.lang.String" value="Select"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSelectActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnLoadLedgerActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>

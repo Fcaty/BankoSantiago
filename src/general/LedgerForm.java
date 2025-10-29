@@ -199,7 +199,7 @@ public class LedgerForm extends javax.swing.JFrame {
         jTable3 = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         ledgerSelection = new javax.swing.JComboBox<>();
-        btnSelect = new javax.swing.JButton();
+        btnLoadLedger = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         txtDebit = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
@@ -257,11 +257,11 @@ public class LedgerForm extends javax.swing.JFrame {
             }
         });
 
-        btnSelect.setFont(new java.awt.Font("HYWenHei-85W", 0, 14)); // NOI18N
-        btnSelect.setText("Select");
-        btnSelect.addActionListener(new java.awt.event.ActionListener() {
+        btnLoadLedger.setFont(new java.awt.Font("HYWenHei-85W", 0, 14)); // NOI18N
+        btnLoadLedger.setText("Select");
+        btnLoadLedger.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSelectActionPerformed(evt);
+                btnLoadLedgerActionPerformed(evt);
             }
         });
 
@@ -273,7 +273,7 @@ public class LedgerForm extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(ledgerSelection, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnSelect, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnLoadLedger, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -281,7 +281,7 @@ public class LedgerForm extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnSelect, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnLoadLedger, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(ledgerSelection, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE))
                 .addContainerGap(15, Short.MAX_VALUE))
         );
@@ -579,9 +579,9 @@ public class LedgerForm extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_ledgerSelectionActionPerformed
 
-    private void btnSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectActionPerformed
+    private void btnLoadLedgerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadLedgerActionPerformed
         loadLedger();
-    }//GEN-LAST:event_btnSelectActionPerformed
+    }//GEN-LAST:event_btnLoadLedgerActionPerformed
 
     /**
      * @param args the command line arguments
@@ -610,9 +610,9 @@ public class LedgerForm extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnExport;
+    private javax.swing.JButton btnLoadLedger;
     private javax.swing.JButton btnPost;
     private javax.swing.JButton btnReturn;
-    private javax.swing.JButton btnSelect;
     private javax.swing.JTable creditsTable;
     private javax.swing.JTable debitsTable;
     private javax.swing.JPanel jPanel1;

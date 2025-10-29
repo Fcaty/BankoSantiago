@@ -219,7 +219,9 @@ public class HomeForm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnJournalizeActionPerformed
 
     private void btnTrialBalanceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTrialBalanceActionPerformed
-        // TODO add your handling code here:
+        TrialBalanceForm trial = new TrialBalanceForm();
+        trial.setVisible(true);
+        dispose();
     }//GEN-LAST:event_btnTrialBalanceActionPerformed
 
     private void btnTruncateTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTruncateTableActionPerformed
