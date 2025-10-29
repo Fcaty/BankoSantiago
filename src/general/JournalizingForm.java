@@ -57,7 +57,7 @@ public class JournalizingForm extends javax.swing.JFrame {
     //Will insert an unfinalized record, locally.
     private void insertRecord(){
         String accountTitle;
-        int AID;
+        int AID = 0;
         char recordType = '\0';
         double amount = 0;
         
@@ -66,7 +66,20 @@ public class JournalizingForm extends javax.swing.JFrame {
             return;
         }
         
-        AID = titleSelection.getSelectedIndex();
+        try(
+                Connection con = DBConn.attemptConnection();
+                PreparedStatement pActIdentify = con.prepareStatement("SELECT AID FROM accountingsystem.account_title WHERE AName = ?");
+                ){
+            
+            pActIdentify.setString(1, (String) titleSelection.getSelectedItem());
+            ResultSet rs = pActIdentify.executeQuery();
+            
+            while(rs.next()) AID = rs.getInt("AID");
+            
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Connection failed! "+ e.getMessage());
+        }
+        
         accountTitle = (String) titleSelection.getSelectedItem();
         amount = Double.parseDouble(amountTxt.getText());
         if(typeSelection.getSelectedIndex() == 1){
