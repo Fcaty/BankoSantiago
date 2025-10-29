@@ -9,6 +9,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
 import database.DBConn;
+import java.util.Scanner;
 
 /**
  *
@@ -17,10 +18,71 @@ import database.DBConn;
 public class TrialBalanceForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(TrialBalanceForm.class.getName());
+    
+    //Will export the current unadjusted trial balance as a .txt file
+    private void generateUTBSheet(){
+        File count = new File("Output"+File.separator+"TB"+File.separator+"count.txt");
+        String filepath = "";
+        String[] acctElements = {"A", "L", "C", "I", "E"};
+        double totalDebit = 0;
+        double totalCredit = 0;
+        
+        try(Scanner myScan = new Scanner(count)){
+            int newCount = myScan.nextInt() + 1; //Name for new file
+            myScan.close();
+            FileWriter fw = new FileWriter(count);
+            fw.write(Integer.toString(newCount));
+            fw.close();
+            filepath = "Output"+File.separator+"TB"+File.separator+ "UTBSheetNo"+(newCount) +".txt"; //Filepath string
+        } catch (FileNotFoundException e) {
+            JOptionPane.showMessageDialog(this, "File not found!");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "IO Error! What did you do? This shouldn't be here!");
+        }
+        
+        try(
+                PrintWriter pw = new PrintWriter(filepath);
+                Connection con = DBConn.attemptConnection();
+                PreparedStatement pstmtScraper = con.prepareStatement("SELECT AName, Normal_Side, Final_Value "
+                        + "FROM accountingsystem.ledger JOIN account_title "
+                        + "ON ledger.AID = account_title.AID "
+                        + "WHERE Account_Type = ?");
+           ){
+            
+            //Header
+            pw.printf("%-45s %10s %45s\n", " ", txtCompanyName.getText(), " ");
+            pw.printf("%-35s %30s %35s\n", " ", "Unadjusted Trial Balance", " ");
+            pw.printf("%-40s %20s %40s\n", " ", "For the Year "+txtYr.getText(), " ");
+            pw.printf("%-50s %25s %25s\n", "Account Title", "  Debit", "  Credit");
+            
+            //Table proper
+            for(String c : acctElements){
+                pstmtScraper.setString(1, c);
+                ResultSet rs = pstmtScraper.executeQuery();
+                
+                while(rs.next()){
+                    if("D".equals(rs.getString("Normal_Side"))){
+                        pw.printf("%-50s %25s %25s\n", rs.getString("AName"), Double.toString(rs.getDouble("Final_Value")), " ");
+                        totalDebit += rs.getDouble("Final_Value");
+                    } else if ("C".equals(rs.getString("Normal_Side"))){
+                        pw.printf("%-50s %25s %25s\n", rs.getString("AName"), "", Double.toString(rs.getDouble("Final_Value")));
+                        totalCredit += rs.getDouble("Final_Value");
+                    }
+                }
+            }
+            
+            pw.printf("%-50s %25s %25s\n", "            TOTAL:", Double.toString(totalDebit), Double.toString(totalCredit));
+            
+        } catch (FileNotFoundException e) {
+            JOptionPane.showMessageDialog(this, "No file found!");
+        } catch (SQLException e){
+            JOptionPane.showMessageDialog(this, "Connection failed! "+ e.getMessage());
+        }
+    }
 
     private void generateUTB(){
         
-        if(txtYear.getText().isEmpty()){
+        if(txtYr.getText().isEmpty()){
             JOptionPane.showMessageDialog(this, "Input a year!");
             return;
         }
@@ -64,7 +126,8 @@ public class TrialBalanceForm extends javax.swing.JFrame {
             
             lblFinalDebit.setText(Double.toString(finalDebit));
             lblFinalCredit.setText(Double.toString(finalCredit));
-            lblYear.setText("For the Year "+txtYear.getText());
+            lblYear.setText("For the Year "+txtYr.getText());
+            lblCompanyName.setText(txtCompanyName.getText());
             con.close();
             
         } catch (SQLException e){
@@ -94,6 +157,7 @@ public class TrialBalanceForm extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         unadjustedTable = new javax.swing.JTable();
         lblYear = new javax.swing.JLabel();
+        lblCompanyName = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         lblFinalDebit = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
@@ -102,7 +166,9 @@ public class TrialBalanceForm extends javax.swing.JFrame {
         btnReturn = new javax.swing.JButton();
         btnLoadTB = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
-        txtYear = new javax.swing.JTextField();
+        txtYr = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        txtCompanyName = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -129,29 +195,36 @@ public class TrialBalanceForm extends javax.swing.JFrame {
         lblYear.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblYear.setText("For the Year ????");
 
+        lblCompanyName.setFont(new java.awt.Font("HYWenHei-85W", 0, 20)); // NOI18N
+        lblCompanyName.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblCompanyName.setText("Company Name");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblYear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
                 .addContainerGap())
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(lblCompanyName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addComponent(lblYear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+                .addComponent(lblCompanyName)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblYear)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 502, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 477, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -226,11 +299,14 @@ public class TrialBalanceForm extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
         jLabel2.setText("Year");
 
-        txtYear.addActionListener(new java.awt.event.ActionListener() {
+        txtYr.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtYearActionPerformed(evt);
+                txtYrActionPerformed(evt);
             }
         });
+
+        jLabel5.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
+        jLabel5.setText("Company Name");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -244,16 +320,20 @@ public class TrialBalanceForm extends javax.swing.JFrame {
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(txtYear)
-                            .addComponent(btnLoadTB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(btnLoadTB)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 66, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btnReturn, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(exportUTB, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(exportUTB, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtYr, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(txtCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 395, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -265,11 +345,15 @@ public class TrialBalanceForm extends javax.swing.JFrame {
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtCompanyName)
+                        .addGap(12, 12, 12)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtYear, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtYr, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(87, 87, 87)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(btnReturn, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -285,12 +369,12 @@ public class TrialBalanceForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exportUTBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportUTBActionPerformed
-        // TODO add your handling code here:
+        generateUTBSheet();
     }//GEN-LAST:event_exportUTBActionPerformed
 
-    private void txtYearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtYearActionPerformed
+    private void txtYrActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtYrActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtYearActionPerformed
+    }//GEN-LAST:event_txtYrActionPerformed
 
     private void btnReturnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturnActionPerformed
         HomeForm home = new HomeForm();
@@ -333,14 +417,17 @@ public class TrialBalanceForm extends javax.swing.JFrame {
     private javax.swing.JButton exportUTB;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblCompanyName;
     private javax.swing.JLabel lblFinalCredit;
     private javax.swing.JLabel lblFinalDebit;
     private javax.swing.JLabel lblYear;
-    private javax.swing.JTextField txtYear;
+    private javax.swing.JTextField txtCompanyName;
+    private javax.swing.JTextField txtYr;
     private javax.swing.JTable unadjustedTable;
     // End of variables declaration//GEN-END:variables
 }
