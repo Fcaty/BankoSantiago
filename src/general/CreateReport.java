@@ -19,6 +19,14 @@ public class CreateReport extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CreateReport.class.getName());
     
+    private boolean checkInput(){
+        if(txtCompanyName.getText().isEmpty() || txtMonthDay.getText().isEmpty() || txtYr.getText().isEmpty()){
+            JOptionPane.showMessageDialog(this, "You have a missing input!");
+            return false;
+        }
+        return true;
+    }
+    
     private void generateBalanceSheet(){
         String currentTypes[] = {"C", "N", "V"};
         String filepath = "";
@@ -30,11 +38,18 @@ public class CreateReport extends javax.swing.JFrame {
         //To track amount of files
         try(Scanner myScan = new Scanner((count))) {
             int newCount = myScan.nextInt() + 1; //Name for new file
+            myScan.close();
+            FileWriter fw = new FileWriter(count);
+            fw.write(Integer.toString(newCount));
+            fw.close();
+            
             filepath = "Output"+File.separator+"BlSheet"+File.separator+ "BalanceSheetNo"+(newCount) +".txt"; //Filepath string
             
         } catch (FileNotFoundException e) {
-            System.out.println("File not found!");
-        } 
+            JOptionPane.showMessageDialog(this, "File not found!");
+        } catch (IOException e){
+            JOptionPane.showMessageDialog(this, "IO Error! You must've messed up so badly for this to show up, huh?");
+        }
         
         //File generation proper
         //Length of string: 100
@@ -150,10 +165,16 @@ public class CreateReport extends javax.swing.JFrame {
         
         try(Scanner myScan = new Scanner(count)){
             int newCount = myScan.nextInt() + 1; //Name for new file
+            myScan.close();
+            FileWriter fw = new FileWriter(count);
+            fw.write(Integer.toString(newCount));
+            fw.close();
             filepath = "Output"+File.separator+"InStat"+File.separator+ "IncomeStatementNo"+(newCount) +".txt"; //Filepath string
         } catch (FileNotFoundException e) {
             JOptionPane.showMessageDialog(this, "File not found!");
-        } 
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "IO Error! What did you do? This shouldn't be here!");
+        }
         
         try(
                 PrintWriter pw = new PrintWriter(filepath);
@@ -201,8 +222,7 @@ public class CreateReport extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Connection failed! "+ e.getMessage());
         }
     }
-
-
+    
     /**
      * Creates new form CreateReport
      */
@@ -348,8 +368,10 @@ public class CreateReport extends javax.swing.JFrame {
     }//GEN-LAST:event_btnReturnActionPerformed
 
     private void btnGenerateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerateActionPerformed
-        generateBalanceSheet();
-        generateIncomeStatement();
+        if(checkInput()){
+            generateBalanceSheet();
+            generateIncomeStatement();
+        }
     }//GEN-LAST:event_btnGenerateActionPerformed
 
     /**

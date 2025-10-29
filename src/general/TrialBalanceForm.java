@@ -19,6 +19,12 @@ public class TrialBalanceForm extends javax.swing.JFrame {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(TrialBalanceForm.class.getName());
 
     private void generateUTB(){
+        
+        if(txtYear.getText().isEmpty()){
+            JOptionPane.showMessageDialog(this, "Input a year!");
+            return;
+        }
+        
         String[] acctElements = {"A", "L", "C", "I", "E"};
         DefaultTableModel tribalTB = (DefaultTableModel) unadjustedTable.getModel();
         tribalTB.setRowCount(0);

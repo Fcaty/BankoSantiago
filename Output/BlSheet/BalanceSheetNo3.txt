@@ -1,0 +1,25 @@
+                                              Riii Company                                              
+                                    Statement of Financial Position                                    
+                                         As of January 01, 2025                                         
+ASSETS
+    CURRENT ASSETS: 
+        Cash                                                        532520.0                          
+        Accounts Receivable                                          72000.0                          
+    NON-CURRENT ASSETS: 
+        Equipment                                                   280000.0                          
+        Furnishings & Fixtures                                       50000.0                          
+    TOTAL ASSETS                                                    934520.0                          
+
+LIABILITIES AND OWNER'S EQUITY
+    LIABILITIES
+    CURRENT LIABILITIES: 
+        Accounts Payable                                                                       40000.0
+    NON-CURRENT LIABILITIES: 
+
+    EQUITY
+        Capital                                                     800000.0                          
+    Add: 
+        NET INCOME                                                   99520.0                          
+    Less: 
+        Drawings                                                      5000.0                          
+TOTAL LIABILITIES AND OWNER'S EQUITY                                934520.0                          

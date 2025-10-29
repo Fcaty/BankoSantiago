@@ -1,0 +1,10 @@
+                                              Rion Company                                              
+                                       Statement of Profit or Loss                                    
+                                         For the Year Ended 2024                                         
+Sales                                                                                          32000.0
+Revenue                                                                                       100000.0
+Gross Profit                                                                                  132000.0
+Less: Operating Expenses                                                                              
+    Expenses                                                         30000.0                          
+    Utilities Expense                                                 2480.0                          
+NET INCOME / NET LOSS                                                                          99520.0

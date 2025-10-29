@@ -20,6 +20,7 @@ public class AddAccountTitleForm extends javax.swing.JFrame {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AddAccountTitleForm.class.getName());
     
     private void addAccountTitle(){
+        char curType = '\0';
         char accountType = '\0';
         if(txtTitle.getText().isEmpty() || elementSelection.getSelectedIndex() == 0){
             JOptionPane.showMessageDialog(this, "Invalid entries, try again!");
@@ -31,8 +32,35 @@ public class AddAccountTitleForm extends javax.swing.JFrame {
                 accountType = 'A';
                 break;
             case 2:
+                accountType = 'L';
+                break;
+            case 3:
+                accountType = 'C';
+                break;
+            case 4:
+                accountType = 'I';
+                break;
+            case 5: 
                 accountType = 'E';
-        }       
+        }
+        
+        switch(elementSelection.getSelectedIndex()){
+            case 1: case 3:
+                if(curTypeSelection.getSelectedIndex() == 1){
+                    curType = 'C';
+                } else if (curTypeSelection.getSelectedIndex() == 2){
+                    curType = 'N';
+                }
+                break;
+            default: 
+                curType = 'V';
+        }
+        
+        //Special case: withdrawals
+        if(txtTitle.getText().equals("Withdrawals") || txtTitle.getText().equals("Drawings")){
+            curType = 'N';
+        }
+        
         
         String sql = ("INSERT INTO accountingsystem.account_title (AName, Normal_Side, Account_Type) values (?, ?, ?)");
         
@@ -78,7 +106,7 @@ public class AddAccountTitleForm extends javax.swing.JFrame {
         elementSelection = new javax.swing.JComboBox<>();
         btnAdd = new javax.swing.JButton();
         btnReturn = new javax.swing.JButton();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        curTypeSelection = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -110,7 +138,7 @@ public class AddAccountTitleForm extends javax.swing.JFrame {
             }
         });
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Select", "Current", "Non-Current" }));
+        curTypeSelection.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Select", "Current", "Non-Current" }));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -126,7 +154,7 @@ public class AddAccountTitleForm extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(elementSelection, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
-                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(curTypeSelection, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -150,7 +178,7 @@ public class AddAccountTitleForm extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(elementSelection, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel2))
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(curTypeSelection, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAdd)
@@ -217,8 +245,8 @@ public class AddAccountTitleForm extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnReturn;
+    private javax.swing.JComboBox<String> curTypeSelection;
     private javax.swing.JComboBox<String> elementSelection;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
