@@ -15,6 +15,28 @@ public class HomeForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(HomeForm.class.getName());
     
+    private void factoryReset(){
+        try(
+                Connection con = DBConn.attemptConnection();
+                Statement clearTables = con.createStatement();
+            ){
+            
+            clearTables.execute("SET FOREIGN_KEY_CHECKS = 0");
+            clearTables.execute("TRUNCATE TABLE accountingsystem.account_titles");
+            clearTables.execute("TRUNCATE TABLE accountingsystem.ledger");
+            clearTables.execute("TRUNCATE TABLE accountingsystem.journal_entries");
+            clearTables.execute("TRUNCATE TABLE accountingsystem.journal");
+            clearTables.execute("SET FOREIGN_KEY_CHECKS = 1");
+            
+            JOptionPane.showMessageDialog(this, "Journal entries cleared!");
+            
+            con.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Connection failed! "+ e.getMessage());
+        }
+    }
+    
+    
     private void clearTables(){
         try(
                 Connection con = DBConn.attemptConnection();
@@ -153,6 +175,11 @@ public class HomeForm extends javax.swing.JFrame {
 
         btnFactoryReset.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
         btnFactoryReset.setText("Reset Database");
+        btnFactoryReset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFactoryResetActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -263,6 +290,10 @@ public class HomeForm extends javax.swing.JFrame {
         ledger.setVisible(true);
         dispose();
     }//GEN-LAST:event_btnLedgerActionPerformed
+
+    private void btnFactoryResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFactoryResetActionPerformed
+        factoryReset();
+    }//GEN-LAST:event_btnFactoryResetActionPerformed
 
     /**
      * @param args the command line arguments
