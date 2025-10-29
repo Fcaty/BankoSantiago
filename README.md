@@ -5,8 +5,8 @@ Main Menu:
   - Table truncation
 
 Journalizing: 
-  - Error Handling (Avoid negative number inputs) 
-  - Protection against account title deletion 
+  - Error Handling (Avoid negative number inputs)  
+  - Protection against account title deletion ✅
   - Refresh History List per submission ✅
   - Refine date & time validation 
   - (Optional) Print Journals through export
