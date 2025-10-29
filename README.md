@@ -19,7 +19,7 @@ Ledger:
 
 Unadjusted Trial Balance:
   - Display unadjusted trial balance on app ✅
-  - (Optional) Print Unadjusted Trial Balance through export 
+  - (Optional) Print Unadjusted Trial Balance through export ✅
 
 Financial Statements
   - Print Balance Sheet through export ✅
