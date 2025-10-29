@@ -3,6 +3,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package general;
+import database.DBConn;
+import java.sql.*;
+import javax.swing.*;
 
 /**
  *
@@ -11,7 +14,26 @@ package general;
 public class HomeForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(HomeForm.class.getName());
-
+    
+    private void clearTables(){
+        try(
+                Connection con = DBConn.attemptConnection();
+                Statement clearTables = con.createStatement();
+            ){
+            
+            clearTables.execute("SET FOREIGN_KEY_CHECKS = 0");
+            clearTables.execute("TRUNCATE TABLE accountingsystem.ledger");
+            clearTables.execute("TRUNCATE TABLE accountingsystem.journal_entries");
+            clearTables.execute("TRUNCATE TABLE accountingsystem.journal");
+            clearTables.execute("SET FOREIGN_KEY_CHECKS = 1");
+            
+            JOptionPane.showMessageDialog(this, "Journal entries cleared!");
+            
+            con.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Connection failed! "+ e.getMessage());
+        }
+    }
     /**
      * Creates new form HomeForm
      */
@@ -41,6 +63,7 @@ public class HomeForm extends javax.swing.JFrame {
         btnTruncateTable = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
+        btnFactoryReset = new javax.swing.JButton();
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -125,8 +148,11 @@ public class HomeForm extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(143, 143, 143)
                 .addComponent(jLabel2)
-                .addContainerGap(156, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        btnFactoryReset.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
+        btnFactoryReset.setText("Reset Database");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -146,7 +172,8 @@ public class HomeForm extends javax.swing.JFrame {
                                     .addComponent(btnReports, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(btnTrialBalance, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(btnLedger, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(btnJournalize, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(btnJournalize, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(btnFactoryReset, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addGap(18, 18, 18)
                                 .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(jPanel2Layout.createSequentialGroup()
@@ -171,19 +198,20 @@ public class HomeForm extends javax.swing.JFrame {
                     .addComponent(infoCourse)
                     .addComponent(infoCourse1))
                 .addGap(15, 15, 15)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
                         .addComponent(btnJournalize, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(12, 12, 12)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnLedger, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnTrialBalance, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnReports, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnTruncateTable, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(btnTruncateTable, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnFactoryReset, javax.swing.GroupLayout.DEFAULT_SIZE, 44, Short.MAX_VALUE))
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(20, Short.MAX_VALUE))
         );
 
@@ -209,7 +237,9 @@ public class HomeForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnReportsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReportsActionPerformed
-        // TODO add your handling code here:
+        CreateReport report = new CreateReport();
+        report.setVisible(true);
+        dispose();
     }//GEN-LAST:event_btnReportsActionPerformed
 
     private void btnJournalizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnJournalizeActionPerformed
@@ -225,7 +255,7 @@ public class HomeForm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTrialBalanceActionPerformed
 
     private void btnTruncateTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTruncateTableActionPerformed
-        // TODO add your handling code here:
+        clearTables();
     }//GEN-LAST:event_btnTruncateTableActionPerformed
 
     private void btnLedgerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLedgerActionPerformed
@@ -260,6 +290,7 @@ public class HomeForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnFactoryReset;
     private javax.swing.JButton btnJournalize;
     private javax.swing.JButton btnLedger;
     private javax.swing.JButton btnReports;

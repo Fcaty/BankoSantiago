@@ -79,6 +79,7 @@
                                       <Component id="btnTrialBalance" alignment="1" max="32767" attributes="0"/>
                                       <Component id="btnLedger" alignment="1" max="32767" attributes="0"/>
                                       <Component id="btnJournalize" max="32767" attributes="0"/>
+                                      <Component id="btnFactoryReset" max="32767" attributes="0"/>
                                   </Group>
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
                                   <Component id="jPanel3" max="32767" attributes="0"/>
@@ -113,11 +114,10 @@
                       <Component id="infoCourse1" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
                       <Group type="102" attributes="0">
-                          <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                           <Component id="btnJournalize" min="-2" pref="44" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="btnLedger" min="-2" pref="44" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="btnTrialBalance" min="-2" pref="44" max="-2" attributes="0"/>
@@ -125,8 +125,10 @@
                           <Component id="btnReports" min="-2" pref="44" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="btnTruncateTable" min="-2" pref="44" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="btnFactoryReset" pref="44" max="32767" attributes="0"/>
                       </Group>
-                      <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jPanel3" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace pref="20" max="32767" attributes="0"/>
               </Group>
@@ -249,7 +251,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="143" max="-2" attributes="0"/>
                       <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="156" max="32767" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -262,6 +264,14 @@
             </Component>
           </SubComponents>
         </Container>
+        <Component class="javax.swing.JButton" name="btnFactoryReset">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="HYWenHei-85W" size="18" style="0"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Reset Database"/>
+          </Properties>
+        </Component>
       </SubComponents>
     </Container>
   </SubComponents>
