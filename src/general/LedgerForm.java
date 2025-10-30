@@ -64,9 +64,8 @@ public class LedgerForm extends javax.swing.JFrame {
                 ResultSet rsEntries = pstmtScraper.executeQuery();
                 
                 //Heading
-            pw.printf("%-15s %21s %15s\n"," ", rs.getString("AName"), " ");
+            pw.printf("%-15s %-21s %15s\n"," ", rs.getString("AName"), " ");
             pw.println("==================================================");
-            pw.printf("%-20s %5s %20s\n", " ", "|", " ");
                 
                 //Inner query: Will collect journal entries and insert them into ArrayLists debitList and creditList
                 while(rsEntries.next()){
@@ -95,6 +94,10 @@ public class LedgerForm extends javax.swing.JFrame {
                     
                     pw.printf("%-20s %5s %20s\n", debitString, "|", creditString);
                 }
+                
+                //Clear lists for next loop
+                debitList.clear();
+                creditList.clear();
                 
                 pw.println("--------------------------------------------------");
                 pw.printf("%-20s %5s %20s\n", Double.toString(totalDebit), "|", Double.toString(totalCredit));
