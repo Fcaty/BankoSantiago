@@ -114,8 +114,9 @@ public class AddAccountTitleForm extends javax.swing.JFrame {
         curTypeSelection = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Banko Santiago Accounting System");
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Insert New Account Title", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(41, 43, 45)), "Insert New Account Title", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
 
         jLabel1.setFont(new java.awt.Font("HYWenHei-85W", 0, 20)); // NOI18N
         jLabel1.setText("Title:");
