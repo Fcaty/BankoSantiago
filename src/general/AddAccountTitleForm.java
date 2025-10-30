@@ -19,49 +19,54 @@ public class AddAccountTitleForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AddAccountTitleForm.class.getName());
     
+    //Responsible for adding new account titles to the database.
     private void addAccountTitle(){
         char curType = '\0';
         char accountType = '\0';
-        if(txtTitle.getText().isEmpty() || elementSelection.getSelectedIndex() == 0){
+        
+        //To ensure all fields are filled and all comboBoxes are selected 
+        if(txtTitle.getText().isEmpty() || elementSelection.getSelectedIndex() == 0 || curTypeSelection.getSelectedIndex() == 0){
             JOptionPane.showMessageDialog(this, "Invalid entries, try again!");
             return;
         }
         
+        //Reads elementSelection comboBox selections
         switch(elementSelection.getSelectedIndex()){
             case 1:
-                accountType = 'A';
+                accountType = 'A'; //Assets
                 break;
             case 2:
-                accountType = 'L';
+                accountType = 'L'; //Liabilities
                 break;
             case 3:
-                accountType = 'C';
+                accountType = 'C'; //Capital 
                 break;
             case 4:
-                accountType = 'I';
+                accountType = 'I'; //Income
                 break;
             case 5: 
-                accountType = 'E';
+                accountType = 'E'; //Expenses
         }
         
+        //Reads currentType comboBox selections
         switch(elementSelection.getSelectedIndex()){
-            case 1: case 3:
+            case 1: case 2:
                 if(curTypeSelection.getSelectedIndex() == 1){
-                    curType = 'C';
+                    curType = 'C'; //Current
                 } else if (curTypeSelection.getSelectedIndex() == 2){
-                    curType = 'N';
+                    curType = 'N'; //Non-current
                 }
                 break;
             default: 
-                curType = 'V';
+                curType = 'V'; //Void (For Capital [EXCLUDING "Drawings" and "Withdrawals" , Income, and Expenses)
         }
         
         //Special case: withdrawals
-        if(txtTitle.getText().equals("Withdrawals") || txtTitle.getText().equals("Drawings")){
+        if(txtTitle.getText().equalsIgnoreCase("Withdrawals") || txtTitle.getText().equalsIgnoreCase("Drawings")){
             curType = 'N';
         }
         
-        
+        //Inserts values into database
         String sql = ("INSERT INTO accountingsystem.account_title (AName, Normal_Side, Account_Type) values (?, ?, ?)");
         
         try(

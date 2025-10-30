@@ -15,6 +15,8 @@ public class HomeForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(HomeForm.class.getName());
     
+    
+    //Will wipe out all data from the database.
     private void factoryReset(){
         try(
                 Connection con = DBConn.attemptConnection();
@@ -36,7 +38,7 @@ public class HomeForm extends javax.swing.JFrame {
         }
     }
     
-    
+    //Will wipe out journal entries and ledgers.
     private void clearTables(){
         try(
                 Connection con = DBConn.attemptConnection();

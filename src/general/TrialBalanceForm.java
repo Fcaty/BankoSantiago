@@ -27,6 +27,8 @@ public class TrialBalanceForm extends javax.swing.JFrame {
         double totalDebit = 0;
         double totalCredit = 0;
         
+        
+        //Reads and Updates count.txt, allowing the system to store multiple UTB txt files.
         try(Scanner myScan = new Scanner(count)){
             int newCount = myScan.nextInt() + 1; //Name for new file
             myScan.close();
@@ -40,6 +42,7 @@ public class TrialBalanceForm extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "IO Error! What did you do? This shouldn't be here!");
         }
         
+        //Printing proper
         try(
                 PrintWriter pw = new PrintWriter(filepath);
                 Connection con = DBConn.attemptConnection();
@@ -79,7 +82,9 @@ public class TrialBalanceForm extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Connection failed! "+ e.getMessage());
         }
     }
-
+    
+    
+    //Generates UTB in UI
     private void generateUTB(){
         
         if(txtYr.getText().isEmpty()){

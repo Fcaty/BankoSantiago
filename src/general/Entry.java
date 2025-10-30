@@ -8,12 +8,15 @@ package general;
  *
  * @author Fcaty
  */
+
+//This class file simply stores the class Entity, used in JournalizingForm to create temporary records, stored locally C:
 public class Entry {
     private String aName;
     private int AID;
     private char recType;
     private double amount;
-
+    
+    //Constructor
     public Entry(int AID, String aName, char recType, double amount) {
         this.AID = AID;
         this.aName = aName;
@@ -21,6 +24,7 @@ public class Entry {
         this.amount = amount;
     }
     
+    //public getter methods
     public int getAID(){
         return this.AID;
     }

@@ -22,6 +22,8 @@ public class LedgerForm extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(LedgerForm.class.getName());
     
+    
+    //Responsible for generating a ledgerSheet .txt file
     private void generateLedgerSheet(){
         double totalDebit = 0;
         double totalCredit = 0;
@@ -32,6 +34,8 @@ public class LedgerForm extends javax.swing.JFrame {
         ArrayList<Double> debitList = new ArrayList<>();
         ArrayList<Double> creditList = new ArrayList<>();
         
+        
+        //Reads and updates count.txt, allowing for multiple ledgerSheets to be stored at the same time
         try(Scanner myScan = new Scanner(count)){
             int newCount = myScan.nextInt() + 1; //Name for new file
             myScan.close();
@@ -45,6 +49,8 @@ public class LedgerForm extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "IO Error! What did you do? This shouldn't be here!");
         }
         
+        
+        //Printing proper
         try(
                 PrintWriter pw = new PrintWriter(filepath);
                 Connection con = DBConn.attemptConnection();
@@ -63,7 +69,8 @@ public class LedgerForm extends javax.swing.JFrame {
                 pstmtScraper.setString(1, rs.getString("AID"));
                 ResultSet rsEntries = pstmtScraper.executeQuery();
                 
-                //Heading
+                //Heading 
+                //String length: 51
             pw.printf("%-15s %-21s %15s\n"," ", rs.getString("AName"), " ");
             pw.println("==================================================");
                 
@@ -99,6 +106,7 @@ public class LedgerForm extends javax.swing.JFrame {
                 debitList.clear();
                 creditList.clear();
                 
+                //Prints total values for debits and credits
                 pw.println("--------------------------------------------------");
                 pw.printf("%-20s %5s %20s\n", Double.toString(totalDebit), "|", Double.toString(totalCredit));
                 pw.println("--------------------------------------------------");
@@ -122,6 +130,8 @@ public class LedgerForm extends javax.swing.JFrame {
         }
     }
     
+    
+    //Responsible for generating ledgers
     private void generateLedgers(){
         int AID = 0;
         String normalSide;
@@ -183,6 +193,8 @@ public class LedgerForm extends javax.swing.JFrame {
         
     }
     
+    
+    //Responsible for loading a selected ledger in the UI
     private void loadLedger(){
         
         
@@ -192,6 +204,7 @@ public class LedgerForm extends javax.swing.JFrame {
         dTb.setRowCount(0);
         cTb.setRowCount(0);
         
+        //If no account title is selected
         if(ledgerSelection.getSelectedIndex() == 0){
             txtDebit.setText("0.0");
             txtCredit.setText("0.0");
@@ -206,6 +219,8 @@ public class LedgerForm extends javax.swing.JFrame {
         
         int AID = 0;
         String normalSide = "";
+        
+        //Ledger loading proper
         try(
                 Connection con = DBConn.attemptConnection();
                 PreparedStatement accountNameIdentify = con.prepareStatement("SELECT AID, Normal_Side FROM accountingsystem.account_title where AName = ?");
@@ -261,6 +276,7 @@ public class LedgerForm extends javax.swing.JFrame {
         
     }
     
+    //Loads ledgerOptions for ledgerSelection comboBox
     private void loadLedgerOptions(){
         
         try(

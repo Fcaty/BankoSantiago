@@ -19,6 +19,7 @@ public class CreateReport extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CreateReport.class.getName());
     
+    //Responsible for verifying input, will ensure no fields are left empty.
     private boolean checkInput(){
         if(txtCompanyName.getText().isEmpty() || txtMonthDay.getText().isEmpty() || txtYr.getText().isEmpty()){
             JOptionPane.showMessageDialog(this, "You have a missing input!");
@@ -27,6 +28,7 @@ public class CreateReport extends javax.swing.JFrame {
         return true;
     }
     
+    //Exports a balanceSheet txt file
     private void generateBalanceSheet(){
         String currentTypes[] = {"C", "N", "V"};
         String filepath = "";
@@ -155,7 +157,8 @@ public class CreateReport extends javax.swing.JFrame {
         }
     
     }
-
+    
+    //Exports an income statement
     private void generateIncomeStatement(){
         File count = new File("Output"+File.separator+"InStat"+File.separator+"count.txt");
         String filepath = "";
@@ -186,6 +189,7 @@ public class CreateReport extends javax.swing.JFrame {
            ){
             
             //Heading
+            //Length of string: 100
             pw.printf("%-45s %10s %45s\n", " ", txtCompanyName.getText(), " ");
             pw.printf("%-35s %30s %35s\n", " ", "Statement of Profit or Loss", " ");
             pw.printf("%-40s %20s %40s\n", " ", "For the Year Ended "+txtYr.getText(), " ");

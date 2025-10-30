@@ -29,6 +29,7 @@ public class JournalizingForm extends javax.swing.JFrame {
         
         String status = null;
         
+        //Connectivity status tracker
         if(con == null){
             status = "OFFLINE";
             lblStatusConn.setText(status);
@@ -62,16 +63,19 @@ public class JournalizingForm extends javax.swing.JFrame {
         char recordType = '\0';
         double amount = 0;
         
+        //To ensure that users will not leave fields empty or leave comboBoxes unselected
         if(((String) titleSelection.getSelectedItem()).equals("Select") || typeSelection.getSelectedIndex() == 0 || amountTxt.getText().isEmpty()){
             JOptionPane.showMessageDialog(this, "Invalid input for entries! Try again!");
             return;
         }
         
+        //To ensure users will not be able to input negative numbers
         if(Integer.parseInt(amountTxt.getText()) <= 0){
             JOptionPane.showMessageDialog(this, "You cannot insert negative values!");
             return;
         } 
         
+        //Sequence to extract AID from a given Account name
         try(
                 Connection con = DBConn.attemptConnection();
                 PreparedStatement pActIdentify = con.prepareStatement("SELECT AID FROM accountingsystem.account_title WHERE AName = ?");
@@ -86,6 +90,7 @@ public class JournalizingForm extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Connection failed! "+ e.getMessage());
         }
         
+        //Stores data from selections in variables
         accountTitle = (String) titleSelection.getSelectedItem();
         amount = Double.parseDouble(amountTxt.getText());
         if(typeSelection.getSelectedIndex() == 1){
@@ -94,7 +99,7 @@ public class JournalizingForm extends javax.swing.JFrame {
             recordType = 'C';
         } 
        
-           
+        //Creates temporary records, stored locally
         Entry entry = new Entry(AID, accountTitle, recordType, amount);
         entryList.add(entry);
         
@@ -102,6 +107,7 @@ public class JournalizingForm extends javax.swing.JFrame {
         typeSelection.setSelectedIndex(0);
         amountTxt.setText("");
         
+        //Tracks balance
         updateHistory();
         
         if(!trackBalance()){
@@ -113,6 +119,7 @@ public class JournalizingForm extends javax.swing.JFrame {
         }
     }
     
+    //Responsible for updating the table seen in the journalizing window
     private void updateHistory(){
         DefaultTableModel model = (DefaultTableModel) historyTable.getModel();
         model.setRowCount(0);
@@ -127,10 +134,12 @@ public class JournalizingForm extends javax.swing.JFrame {
         }
     }
     
+    //Responsible for exporting a journalEntrySheet txt file
     private void generateJournalSheet(){
         File count = new File("Output"+File.separator+"Journals"+File.separator+"count.txt");
         String filepath = "";
         
+        //Reads and updates count.txt, which allows for multiple .txt files to be stored at the same time
         try(Scanner myScan = new Scanner(count)){
             int newCount = myScan.nextInt() + 1; //Name for new file
             myScan.close();
@@ -144,6 +153,7 @@ public class JournalizingForm extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "IO Error! What did you do? This shouldn't be here!");
         }
         
+        //Printing proper
         try(
                 PrintWriter pw = new PrintWriter(filepath);
                 Connection con = DBConn.attemptConnection();
@@ -184,6 +194,8 @@ public class JournalizingForm extends javax.swing.JFrame {
         }
     }
     
+    
+    //Responsible for tracking balance
     private boolean trackBalance(){
         double debitAmount = 0;
         double creditAmount = 0;
@@ -207,6 +219,7 @@ public class JournalizingForm extends javax.swing.JFrame {
         }
     }
     
+    //Responsible for ensuring proper date format
     private boolean verifyDate(int year, int month, int day){
         
         // Validation of year
@@ -229,10 +242,12 @@ public class JournalizingForm extends javax.swing.JFrame {
         return true;
     }
     
+    //Tracks if inserted year is a leap year
     private boolean isLeapYear(int year) {
     return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
     }
     
+    //Will gather all entries stored in entryList, adding them all to the database.
     private void addEntry(){
         String sql;
         String date;
@@ -304,7 +319,7 @@ public class JournalizingForm extends javax.swing.JFrame {
             updateHistory();
             trackBalance();
             lblStatusConn.setText("ONLINE");
-            lblStatusConn.setForeground(Color.decode("#00CC00"));
+            lblStatusConn.setForeground(Color.decode("#00CC00")); //Personal comment: Would fix this if i had the time
             
         } catch (SQLException e){
             JOptionPane.showMessageDialog(this, "Connection Failed! "+ e.getMessage());
