@@ -30,7 +30,7 @@ public class JournalizingForm extends javax.swing.JFrame {
         String status = null;
         
         if(con == null){
-            status = "FAILED";
+            status = "OFFLINE";
             lblStatusConn.setText(status);
             lblStatusConn.setForeground(Color.red);
             return;
@@ -369,7 +369,7 @@ public class JournalizingForm extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Banko Santiago Accounting System");
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Insert Records", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(41, 43, 45)), "Insert Records", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
 
         btnAddAccountTitle.setFont(new java.awt.Font("JetBrains Mono", 0, 14)); // NOI18N
         btnAddAccountTitle.setText("+");
@@ -471,7 +471,7 @@ public class JournalizingForm extends javax.swing.JFrame {
                 .addContainerGap(19, Short.MAX_VALUE))
         );
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "History", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(41, 43, 45)), "History", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
 
         historyTable.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         historyTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -519,7 +519,7 @@ public class JournalizingForm extends javax.swing.JFrame {
                 .addGap(0, 8, Short.MAX_VALUE))
         );
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Entry Submission", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(41, 43, 45)), "Entry Submission", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
 
         jLabel3.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
         jLabel3.setText("Enter Notes");
@@ -615,7 +615,7 @@ public class JournalizingForm extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Status", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(41, 43, 45)), "Status", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
 
         lblStatusConn.setFont(new java.awt.Font("HYWenHei-85W", 0, 24)); // NOI18N
         lblStatusConn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -638,7 +638,7 @@ public class JournalizingForm extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Balance", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(41, 43, 45)), "Balance", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("HYWenHei-85W", 0, 24))); // NOI18N
 
         debit.setFont(new java.awt.Font("HYWenHei-85W", 0, 18)); // NOI18N
         debit.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);

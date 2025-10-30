@@ -106,7 +106,7 @@ public class HomeForm extends javax.swing.JFrame {
         infoCourse.setText("ACCT 1001 FINAL PROJECT");
 
         jLabel1.setFont(new java.awt.Font("HYWenHei-85W", 0, 36)); // NOI18N
-        jLabel1.setText("Banko Santiago");
+        jLabel1.setText("Banko Santiago ng Pilipinas");
 
         infoCourse1.setFont(new java.awt.Font("HYWenHei-85W", 0, 14)); // NOI18N
         infoCourse1.setText("Bustos, Santiago, Siega");
@@ -209,7 +209,7 @@ public class HomeForm extends javax.swing.JFrame {
                                 .addComponent(infoCourse)))
                         .addGap(46, 46, 46))))
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(226, 226, 226)
+                .addGap(125, 125, 125)
                 .addComponent(jLabel1)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
