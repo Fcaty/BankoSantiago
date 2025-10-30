@@ -10,6 +10,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
 import database.DBConn;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 
@@ -22,11 +23,14 @@ public class LedgerForm extends javax.swing.JFrame {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(LedgerForm.class.getName());
     
     private void generateLedgerSheet(){
-        //ArrayList<Double> = new ArrayList;
         double totalDebit = 0;
         double totalCredit = 0;
+        double finalVal = 0;
+        int largerList = 0;
         File count = new File("Output"+File.separator+"Ledgers"+File.separator+"count.txt");
         String filepath = "";
+        ArrayList<Double> debitList = new ArrayList<>();
+        ArrayList<Double> creditList = new ArrayList<>();
         
         try(Scanner myScan = new Scanner(count)){
             int newCount = myScan.nextInt() + 1; //Name for new file
@@ -46,12 +50,67 @@ public class LedgerForm extends javax.swing.JFrame {
                 Connection con = DBConn.attemptConnection();
                 PreparedStatement pstmtScraper = con.prepareStatement("SELECT Amount, Record_Type "
                         + "FROM accountingsystem.journal_entries "
-                        + "WHERE AID = ?")
+                        + "WHERE AID = ?");
+                Statement stmt = con.createStatement();
            ){
             
-            pw.printf("%-15s %21s %15s\n"," ", "LedgerName", " ");
+            //Outer query: Will collect accountTitles
+            ResultSet rs = stmt.executeQuery("SELECT AID, AName, Normal_Side FROM accountingsystem.account_title");
+            while(rs.next()){
+                totalDebit = 0;
+                totalCredit = 0;
+                finalVal = 0;
+                pstmtScraper.setString(1, rs.getString("AID"));
+                ResultSet rsEntries = pstmtScraper.executeQuery();
+                
+                //Heading
+            pw.printf("%-15s %21s %15s\n"," ", rs.getString("AName"), " ");
             pw.println("==================================================");
-            pw.printf("%-25s %1s %25s\n", " ", "|", " ");
+            pw.printf("%-20s %5s %20s\n", " ", "|", " ");
+                
+                //Inner query: Will collect journal entries and insert them into ArrayLists debitList and creditList
+                while(rsEntries.next()){
+                    if("D".equals(rsEntries.getString("Record_Type"))){
+                        debitList.add(rsEntries.getDouble("Amount"));
+                        totalDebit += rsEntries.getDouble("Amount");
+                        
+                    } else if ("C".equals(rsEntries.getString("Record_Type"))){
+                        creditList.add(rsEntries.getDouble("Amount"));
+                        totalCredit += rsEntries.getDouble("Amount");
+                    }
+                }
+                
+                largerList = Math.max(debitList.size(), creditList.size()); //Calculates larger list
+                
+                //Print sequence for ledger entries
+                for(int i = 0; i < largerList; i++){
+                    String debitString = "";
+                    String creditString = "";
+                    if(i < debitList.size()){
+                        debitString = Double.toString(debitList.get(i));
+                    }
+                    if(i < creditList.size()){
+                        creditString = Double.toString(creditList.get(i));
+                    }
+                    
+                    pw.printf("%-20s %5s %20s\n", debitString, "|", creditString);
+                }
+                
+                pw.println("--------------------------------------------------");
+                pw.printf("%-20s %5s %20s\n", Double.toString(totalDebit), "|", Double.toString(totalCredit));
+                pw.println("--------------------------------------------------");
+                
+                //Identify normal side and calculate final value
+                if("D".equals(rs.getString("Normal_Side"))){
+                    finalVal = totalDebit - totalCredit;
+                    pw.printf("%-20s %5s %20s\n", Double.toString(finalVal), "|", "");
+                } else if ("C".equals(rs.getString("Normal_Side"))){
+                    finalVal = totalCredit - totalDebit;
+                    pw.printf("%-20s %5s %20s\n", " ", "|", Double.toString(finalVal));
+                }
+               
+                pw.println("\n\n\n");
+            }
             
         } catch (FileNotFoundException e) {
             JOptionPane.showMessageDialog(this, "File not found!");
